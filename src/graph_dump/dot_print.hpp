@@ -2,6 +2,7 @@
 #include "ast.hpp"
 #include <ostream>
 #include <iostream>
+#include <string>
 
 class GraphDump : public IVisitor {
     int node_cnt = 0;
@@ -17,8 +18,11 @@ public:
     void visit(AssignmentNode& node) override;
     void visit(PrintNode& node) override;
     void visit(BlockNode& node) override;
+    void visit(IfStmtNode& node) override;
+    void visit(WhileStmtNode& node) override;
     void footer_write() const;
 private:
     int  next_id() {return ++node_cnt;}
     void edge_write(int from, int to) const;
+    std::string get_op(const BinOp& op) const;
 };

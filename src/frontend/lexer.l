@@ -14,27 +14,43 @@ extern "C" int yylex();
 
 [ \t\r\n]+              { }
 
-"print"                 { return TOKEN_PRINT; }
+"print"                 { return PRINT; }
+"if"                    { return IF; }
+"else"                  { return ELSE; }
+"while"                 { return WHILE; }
 
 [0-9]+                  {
-                            yylval.num = std::atoi(yytext);
-                            return TOKEN_NUMBER;
+                            yylval.num = std::atoll(yytext);
+                            return NUM;
                         }
 
 [a-zA-Z_][a-zA-Z0-9_]*  {
                             yylval.str = strdup(yytext);
-                            return TOKEN_ID;
+                            return ID;
                         }
 
-"+"                     { return '+'; }
-"-"                     { return '-'; }
-"*"                     { return '*'; }
-"/"                     { return '/'; }
-"="                     { return '='; }
-";"                     { return ';'; }
-"("                     { return '('; }
-")"                     { return ')'; }
+"+"                     { return ADD; }
+"-"                     { return SUB; }
+"*"                     { return MUL; }
+"/"                     { return DIV; }
+"="                     { return ASSIGN; }
+";"                     { return SEMICOLON; }
+"("                     { return LPAREN; }
+")"                     { return RPAREN; }
+"&&"                    { return AND; }
+"||"                    { return OR; }
+"%"                     { return MOD; }
 
-.                       { }
+"=="                    { return EQ_ASSIGN; }
+"!="                    { return NEQ_ASSIGN; }
+"<="                    { return LOW_EQ; }
+">="                    { return HIGH_EQ; }
+"<"                     { return LOW; }
+">"                     { return HIGH; }
+
+"{"                     { return LBRACE; }
+"}"                     { return RBRACE; }
+
+.                       {  }
 
 %%
