@@ -2,6 +2,7 @@
 #include "ast.hpp"
 #include <iostream>
 #include <memory>
+#include <vector>
 
 extern "C" int yylex();
 extern int yylineno;
@@ -15,21 +16,13 @@ std::unique_ptr<BlockNode> rootBlock;
     char* str;
     ASTNode* node;
     BlockNode* block;
-    std::vector <Param>* params;
+    std::vector<Param>* params;
     std::vector<std::unique_ptr<ASTNode>>* args;
 }
 
-%token FN RETURN ARROW COMMA
-
-%type <node> fn_decl return_stmt call_expr
-%type <params> param_list params // Нужно добавить std::vector<Param>* в %union
-%type <args> arg_list args     // Нужно добавить std::vector<ASTNode*>* в %union
-
-%%
-
 %token <num> NUM
 %token <str> ID
-%token PRINT IF ELSE WHILE
+%token FN RETURN ARROW COMMA PRINT IF ELSE WHILE
 %token EQ_ASSIGN NEQ_ASSIGN LOW_EQ HIGH_EQ AND OR LOW HIGH ADD SUB MUL DIV MOD
 %token ASSIGN SEMICOLON LPAREN RPAREN LBRACE RBRACE
 
@@ -40,26 +33,20 @@ std::unique_ptr<BlockNode> rootBlock;
 %left MUL DIV MOD
 %right NOT
 
-%type <node> statement expr compound_statement
+%type <node> statement expr compound_statement fn_decl return_stmt call_expr
 %type <block> statements
+%type <params> param_list params
+%type <args> arg_list args
 
 %%
 
 program:
-    statements {
-        rootBlock = std::unique_ptr<BlockNode>($1);
-    }
+    statements { rootBlock = std::unique_ptr<BlockNode>($1); }
     ;
 
 statements:
-    statements statement {
-        $1->add_statement(std::unique_ptr<ASTNode>($2));
-        $$ = $1;
-    }
-    | statement {
-        $$ = new BlockNode();
-        $$->add_statement(std::unique_ptr<ASTNode>($1));
-    }
+    statements statement { $1->add_statement(std::unique_ptr<ASTNode>($2)); $$ = $1; }
+    | statement { $$ = new BlockNode(); $$->add_statement(std::unique_ptr<ASTNode>($1)); }
     ;
 
 statement:
@@ -74,16 +61,14 @@ statement:
     ;
 
 compound_statement:
-    LBRACE statements RBRACE {
-        $$ = $2;
-    }
+    LBRACE statements RBRACE { $$ = $2; }
     ;
 
-
 fn_decl:
-    FN ID LPAREN params RPAREN ARROW ID compound_statement {
-        $$ = new FnDeclNode($2, *$4, std::unique_ptr<BlockNode>(static_cast<BlockNode*>($7)));
-        delete $4; free($2); free($8);
+    FN ID LPAREN params RPAREN compound_statement {
+        // Исправлено: индекс $6 вместо $7
+        $$ = new FnDeclNode($2, *$4, std::unique_ptr<BlockNode>(static_cast<BlockNode*>($6)));
+        delete $4; free($2);
     }
     ;
 
@@ -106,9 +91,20 @@ args:
     | arg_list { $$ = $1; }
     ;
 
+arg_list:
+    expr {
+        $$ = new std::vector<std::unique_ptr<ASTNode>>();
+        $$->push_back(std::unique_ptr<ASTNode>($1));
+    }
+    | arg_list COMMA expr {
+        $1->push_back(std::unique_ptr<ASTNode>($3));
+        $$ = $1;
+    }
+    ;
+
 expr:
     NUM { $$ = new NumberNode($1); }
-    | ID   { $$ = new VariableNode($1); free($1); }
+    | ID { $$ = new VariableNode($1); free($1); }
     | expr ADD expr { $$ = new BinaryOpNode(BinOp::ADD, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr SUB expr { $$ = new BinaryOpNode(BinOp::SUB, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr MUL expr { $$ = new BinaryOpNode(BinOp::MUL, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
@@ -117,13 +113,13 @@ expr:
     | expr EQ_ASSIGN expr  { $$ = new BinaryOpNode(BinOp::EQ_ASSIGN, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr NEQ_ASSIGN expr  { $$ = new BinaryOpNode(BinOp::NEQ_ASSIGN, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr LOW expr       { $$ = new BinaryOpNode(BinOp::LOW, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr HIGH expr       { $$ = new BinaryOpNode(BinOp::HIGH, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr LOW_EQ expr  { $$ = new BinaryOpNode(BinOp::LOW_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr HIGH_EQ expr  { $$ = new BinaryOpNode(BinOp::HIGH_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr AND expr { $$ = new BinaryOpNode(BinOp::AND, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr OR expr  { $$ = new BinaryOpNode(BinOp::OR, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | NOT expr { $$ = new UnaryOpNode(UnaryOp::NOT, std:unique_ptr<ASTNode>($2))}
-    | LPAREN expr RPAREN        { $$ = $2; }
+    | expr HIGH expr      { $$ = new BinaryOpNode(BinOp::HIGH, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr LOW_EQ expr    { $$ = new BinaryOpNode(BinOp::LOW_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr HIGH_EQ expr   { $$ = new BinaryOpNode(BinOp::HIGH_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr AND expr       { $$ = new BinaryOpNode(BinOp::AND, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr OR expr        { $$ = new BinaryOpNode(BinOp::OR, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | NOT expr            { $$ = new UnaryOpNode(UnaryOp::NOT, std::unique_ptr<ASTNode>($2)); } // Исправлено: std::unique_ptr
+    | LPAREN expr RPAREN  { $$ = $2; }
     | ID LPAREN args RPAREN { $$ = new CallExprNode($1, std::move(*$3)); delete $3; free($1); }
     ;
 

@@ -15,7 +15,7 @@ void GraphDump::edge_write(int from, int to) const {
 
 void GraphDump::visit(NumberNode& node) {
     cur_node_id = next_id();
-    os << "  node" << cur_node_id << " [label=\"IntLit: " << node.value << "\", fillcolor=lightblue];\n";
+    os << "  node" << cur_node_id << " [label=\"Num: " << node.value << "\", fillcolor=lightblue];\n";
 }
 
 void GraphDump::visit(VariableNode& node) {

@@ -3,6 +3,7 @@
 #include "parser.hpp"
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 extern "C" int yylex();
 %}
@@ -18,8 +19,9 @@ extern "C" int yylex();
 "if"                    { return IF; }
 "else"                  { return ELSE; }
 "while"                 { return WHILE; }
-"func"                    { return FN; }
+"func"                  { return FN; }
 "return"                { return RETURN; }
+
 [0-9]+                  {
                             yylval.num = std::atoll(yytext);
                             return NUM;
@@ -42,17 +44,17 @@ extern "C" int yylex();
 "||"                    { return OR; }
 "%"                     { return MOD; }
 "!"                     { return NOT; }
-
 "=="                    { return EQ_ASSIGN; }
 "!="                    { return NEQ_ASSIGN; }
 "<="                    { return LOW_EQ; }
 ">="                    { return HIGH_EQ; }
 "<"                     { return LOW; }
 ">"                     { return HIGH; }
-
 "{"                     { return LBRACE; }
 "}"                     { return RBRACE; }
+","                     { return COMMA; }
 
-.                       {  }
+.                       { std::cerr << "Unknown character: "
+                        << yytext << " at line " << yylineno << std::endl; }
 
 %%
