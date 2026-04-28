@@ -34,6 +34,11 @@ extern "C" int yylex();
                             return ID;
                         }
 
+"+="                    { return ADD_ASSIGN; }
+"-="                    { return SUB_ASSIGN; }
+"*="                    { return MUL_ASSIGN; }
+"/="                    { return DIV_ASSIGN; }
+"%="                    { return MOD_ASSIGN; }
 "+"                     { return ADD; }
 "-"                     { return SUB; }
 "*"                     { return MUL; }

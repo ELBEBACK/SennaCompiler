@@ -25,6 +25,7 @@ std::unique_ptr<BlockNode> rootBlock;
 %token FN RETURN ARROW COMMA PRINT IF ELSE WHILE
 %token EQ_ASSIGN NEQ_ASSIGN LOW_EQ HIGH_EQ AND OR LOW HIGH ADD SUB MUL DIV MOD
 %token ASSIGN SEMICOLON LPAREN RPAREN LBRACE RBRACE
+%token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
 
 %left OR
 %left AND
@@ -33,7 +34,7 @@ std::unique_ptr<BlockNode> rootBlock;
 %left MUL DIV MOD
 %right NOT
 
-%type <node> statement expr compound_statement fn_decl return_stmt call_expr
+%type <node> statement expr compound_statement fn_decl return_stmt
 %type <block> statements
 %type <params> param_list params
 %type <args> arg_list args
@@ -58,6 +59,36 @@ statement:
     | WHILE LPAREN expr RPAREN compound_statement { $$ = new WhileStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5)); }
     | fn_decl { $$ = $1; }
     | return_stmt { $$ = $1; }
+    | ID ADD_ASSIGN expr SEMICOLON {
+        auto current_var = std::make_unique<VariableNode>($1);
+        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::ADD, std::move(current_var), std::unique_ptr<ASTNode>($3));
+        $$ = new AssignmentNode($1, std::move(bin_op));
+        free($1);
+    }
+    | ID SUB_ASSIGN expr SEMICOLON {
+        auto current_var = std::make_unique<VariableNode>($1);
+        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::SUB, std::move(current_var), std::unique_ptr<ASTNode>($3));
+        $$ = new AssignmentNode($1, std::move(bin_op));
+        free($1);
+    }
+    | ID MUL_ASSIGN expr SEMICOLON {
+        auto current_var = std::make_unique<VariableNode>($1);
+        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::MUL, std::move(current_var), std::unique_ptr<ASTNode>($3));
+        $$ = new AssignmentNode($1, std::move(bin_op));
+        free($1);
+    }
+    | ID DIV_ASSIGN expr SEMICOLON {
+        auto current_var = std::make_unique<VariableNode>($1);
+        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::DIV, std::move(current_var), std::unique_ptr<ASTNode>($3));
+        $$ = new AssignmentNode($1, std::move(bin_op));
+        free($1);
+    }
+    | ID MOD_ASSIGN expr SEMICOLON {
+        auto current_var = std::make_unique<VariableNode>($1);
+        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::MOD, std::move(current_var), std::unique_ptr<ASTNode>($3));
+        $$ = new AssignmentNode($1, std::move(bin_op));
+        free($1);
+    }
     ;
 
 compound_statement:
