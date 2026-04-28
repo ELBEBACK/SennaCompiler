@@ -122,3 +122,46 @@ std::string GraphDump::get_op(const BinOp& op) const {
         default: return "undef op";
     }
 }
+
+void GraphDump::visit(UnaryOpNode& node) {
+    int id = next_id();
+    os << "  node" << id << " [label=\"Unary: !\", fillcolor=vividviolet];\n";
+    node.operand->accept(*this);
+    edge_write(id, cur_node_id);
+    cur_node_id = id;
+}
+
+void GraphDump::visit(CallExprNode& node) {
+    int id = next_id();
+    os << "  node" << id << " [label=\"Call: " << node.function_name << "\", fillcolor=lightskyblue];\n";
+    for (auto& arg : node.arguments) {
+        arg->accept(*this);
+        edge_write(id, cur_node_id);
+    }
+    cur_node_id = id;
+}
+
+void GraphDump::visit(ReturnStmtNode& node) {
+    int id = next_id();
+    os << "  node" << id << " [label=\"Return\", fillcolor=tomato];\n";
+    if (node.expr) {
+        node.expr->accept(*this);
+        edge_write(id, cur_node_id);
+    }
+    cur_node_id = id;
+}
+
+void GraphDump::visit(FnDeclNode& node) {
+    int id = next_id();
+    os << "  node" << id << " [label=\"Function: " << node.name << "\", fillcolor=mediumaquamarine];\n";
+
+    for (auto& p : node.params) {
+        int pid = next_id();
+        os << "  node" << pid << " [label=\"Param: " << p.name << "\", shape=ellipse];\n";
+        edge_write(id, pid);
+    }
+
+    node.body->accept(*this);
+    edge_write(id, cur_node_id);
+    cur_node_id = id;
+}

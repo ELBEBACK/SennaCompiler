@@ -15,7 +15,17 @@ std::unique_ptr<BlockNode> rootBlock;
     char* str;
     ASTNode* node;
     BlockNode* block;
+    std::vector <Param>* params;
+    std::vector<std::unique_ptr<ASTNode>>* args;
 }
+
+%token FN RETURN ARROW COMMA
+
+%type <node> fn_decl return_stmt call_expr
+%type <params> param_list params // Нужно добавить std::vector<Param>* в %union
+%type <args> arg_list args     // Нужно добавить std::vector<ASTNode*>* в %union
+
+%%
 
 %token <num> NUM
 %token <str> ID
@@ -28,6 +38,7 @@ std::unique_ptr<BlockNode> rootBlock;
 %left EQ_ASSIGN NEQ_ASSIGN LOW HIGH LOW_EQ HIGH_EQ
 %left ADD SUB
 %left MUL DIV MOD
+%right NOT
 
 %type <node> statement expr compound_statement
 %type <block> statements
@@ -52,31 +63,47 @@ statements:
     ;
 
 statement:
-    ID ASSIGN expr SEMICOLON {
-        $$ = new AssignmentNode($1, std::unique_ptr<ASTNode>($3));
-        free($1);
-    }
-    | PRINT expr SEMICOLON {
-        $$ = new PrintNode(std::unique_ptr<ASTNode>($2));
-    }
-    | expr SEMICOLON {
-        $$ = $1;
-    }
-    | IF LPAREN expr RPAREN compound_statement {
-        $$ = new IfStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5));
-    }
-    | IF LPAREN expr RPAREN compound_statement ELSE compound_statement {
-        $$ = new IfStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5), std::unique_ptr<ASTNode>($7));
-    }
-    | WHILE LPAREN expr RPAREN compound_statement {
-        $$ = new WhileStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5));
-    }
+    ID ASSIGN expr SEMICOLON { $$ = new AssignmentNode($1, std::unique_ptr<ASTNode>($3)); free($1); }
+    | PRINT expr SEMICOLON { $$ = new PrintNode(std::unique_ptr<ASTNode>($2)); }
+    | expr SEMICOLON { $$ = $1; }
+    | IF LPAREN expr RPAREN compound_statement { $$ = new IfStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5)); }
+    | IF LPAREN expr RPAREN compound_statement ELSE compound_statement { $$ = new IfStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5), std::unique_ptr<ASTNode>($7)); }
+    | WHILE LPAREN expr RPAREN compound_statement { $$ = new WhileStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5)); }
+    | fn_decl { $$ = $1; }
+    | return_stmt { $$ = $1; }
     ;
 
 compound_statement:
     LBRACE statements RBRACE {
         $$ = $2;
     }
+    ;
+
+
+fn_decl:
+    FN ID LPAREN params RPAREN ARROW ID compound_statement {
+        $$ = new FnDeclNode($2, *$4, std::unique_ptr<BlockNode>(static_cast<BlockNode*>($7)));
+        delete $4; free($2); free($8);
+    }
+    ;
+
+params:
+    { $$ = new std::vector<Param>(); }
+    | param_list { $$ = $1; }
+    ;
+
+param_list:
+    ID { $$ = new std::vector<Param>(); $$->push_back({$1}); free($1); }
+    | param_list COMMA ID { $1->push_back({$3}); $$ = $1; free($3); }
+    ;
+
+return_stmt:
+    RETURN expr SEMICOLON { $$ = new ReturnStmtNode(std::unique_ptr<ASTNode>($2)); }
+    ;
+
+args:
+    { $$ = new std::vector<std::unique_ptr<ASTNode>>(); }
+    | arg_list { $$ = $1; }
     ;
 
 expr:
@@ -95,7 +122,9 @@ expr:
     | expr HIGH_EQ expr  { $$ = new BinaryOpNode(BinOp::HIGH_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr AND expr { $$ = new BinaryOpNode(BinOp::AND, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr OR expr  { $$ = new BinaryOpNode(BinOp::OR, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | NOT expr { $$ = new UnaryOpNode(UnaryOp::NOT, std:unique_ptr<ASTNode>($2))}
     | LPAREN expr RPAREN        { $$ = $2; }
+    | ID LPAREN args RPAREN { $$ = new CallExprNode($1, std::move(*$3)); delete $3; free($1); }
     ;
 
 %%

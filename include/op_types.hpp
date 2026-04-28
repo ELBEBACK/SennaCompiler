@@ -21,3 +21,7 @@ enum class BinOp {
     LOW_EQ,     //<=
     HIGH_EQ     //>=
 };
+
+enum class UnaryOp {
+    NOT
+};

@@ -20,6 +20,7 @@ public:
     void visit(BlockNode& node) override;
     void visit(IfStmtNode& node) override;
     void visit(WhileStmtNode& node) override;
+    void visit(FnDeclNode& node) override;
     void footer_write() const;
 private:
     int  next_id() {return ++node_cnt;}

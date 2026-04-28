@@ -13,6 +13,10 @@ class PrintNode;
 class BlockNode;
 class IfStmtNode;
 class WhileStmtNode;
+class UnaryOpNode;
+class FnDeclNode;
+class CallExprNode;
+class ReturnStmtNode;
 
 class IVisitor {
 public:
@@ -25,6 +29,10 @@ public:
     virtual void visit(BlockNode& node) = 0;
     virtual void visit(IfStmtNode& node) = 0;
     virtual void visit(WhileStmtNode& node) = 0;
+    virtual void visit(UnaryOpNode& node) = 0;
+    virtual void visit(FnDeclNode& node) = 0;
+    virtual void visit(CallExprNode& node) = 0;
+    virtual void visit(ReturnStmtNode& node) = 0;
 };
 
 class ASTNode {
@@ -36,7 +44,7 @@ public:
 class NumberNode : public ASTNode {
 public:
     long long value;
-    explicit NumberNode(int val) : value(val) {}
+    explicit NumberNode(long long val) : value(val) {}
     void accept(IVisitor& visitor) override { visitor.visit(*this); }
 };
 
@@ -108,5 +116,50 @@ public:
     WhileStmtNode(std::unique_ptr<ASTNode> cond, std::unique_ptr<ASTNode> body)
         : condition(std::move(cond)), body(std::move(body)) {}
 
+    void accept(IVisitor& visitor) override { visitor.visit(*this); }
+};
+
+class UnaryOpNode : public ASTNode {
+public:
+    UnaryOp op;
+    std::unique_ptr<ASTNode> operand;
+
+    UnaryOpNode(UnaryOp op, std::unique_ptr<ASTNode> operand)
+        : op(op), operand(std::move(operand)) {}
+
+    void accept(IVisitor& visitor) override { visitor.visit(*this); }
+};
+
+struct Param {
+    std::string name;
+};
+
+class FnDeclNode : public ASTNode {
+public:
+    std::string name;
+    std::vector<Param> params;
+    std::unique_ptr<BlockNode> body;
+
+    FnDeclNode(std::string name, std::vector<Param> params, std::unique_ptr<BlockNode> body)
+        : name(std::move(name)), params(std::move(params)), body(std::move(body)) {}
+
+    void accept(IVisitor& visitor) override { visitor.visit(*this); }
+};
+
+class CallExprNode : public ASTNode {
+public:
+    std::string function_name;
+    std::vector<std::unique_ptr<ASTNode>> arguments;
+
+    CallExprNode(std::string name, std::vector<std::unique_ptr<ASTNode>> args)
+        : function_name(std::move(name)), arguments(std::move(args)) {}
+
+    void accept(IVisitor& visitor) override { visitor.visit(*this); }
+};
+
+class ReturnStmtNode : public ASTNode {
+public:
+    std::unique_ptr<ASTNode> expr;
+    explicit ReturnStmtNode(std::unique_ptr<ASTNode> e) : expr(std::move(e)) {}
     void accept(IVisitor& visitor) override { visitor.visit(*this); }
 };

@@ -18,7 +18,8 @@ extern "C" int yylex();
 "if"                    { return IF; }
 "else"                  { return ELSE; }
 "while"                 { return WHILE; }
-
+"func"                    { return FN; }
+"return"                { return RETURN; }
 [0-9]+                  {
                             yylval.num = std::atoll(yytext);
                             return NUM;
@@ -40,6 +41,7 @@ extern "C" int yylex();
 "&&"                    { return AND; }
 "||"                    { return OR; }
 "%"                     { return MOD; }
+"!"                     { return NOT; }
 
 "=="                    { return EQ_ASSIGN; }
 "!="                    { return NEQ_ASSIGN; }
