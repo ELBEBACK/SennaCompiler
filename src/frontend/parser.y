@@ -103,23 +103,23 @@ arg_list:
     ;
 
 expr:
-    NUM { $$ = new NumberNode($1); }
-    | ID { $$ = new VariableNode($1); free($1); }
-    | expr ADD expr { $$ = new BinaryOpNode(BinOp::ADD, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr SUB expr { $$ = new BinaryOpNode(BinOp::SUB, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr MUL expr { $$ = new BinaryOpNode(BinOp::MUL, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr DIV expr { $$ = new BinaryOpNode(BinOp::DIV, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr MOD expr { $$ = new BinaryOpNode(BinOp::MOD, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr EQ_ASSIGN expr  { $$ = new BinaryOpNode(BinOp::EQ_ASSIGN, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    NUM                     { $$ = new NumberNode($1); }
+    | ID                    { $$ = new VariableNode($1); free($1); }
+    | expr ADD expr         { $$ = new BinaryOpNode(BinOp::ADD, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr SUB expr         { $$ = new BinaryOpNode(BinOp::SUB, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr MUL expr         { $$ = new BinaryOpNode(BinOp::MUL, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr DIV expr         { $$ = new BinaryOpNode(BinOp::DIV, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr MOD expr         { $$ = new BinaryOpNode(BinOp::MOD, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr EQ_ASSIGN expr   { $$ = new BinaryOpNode(BinOp::EQ_ASSIGN, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr NEQ_ASSIGN expr  { $$ = new BinaryOpNode(BinOp::NEQ_ASSIGN, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr LOW expr       { $$ = new BinaryOpNode(BinOp::LOW, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr HIGH expr      { $$ = new BinaryOpNode(BinOp::HIGH, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr LOW_EQ expr    { $$ = new BinaryOpNode(BinOp::LOW_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr HIGH_EQ expr   { $$ = new BinaryOpNode(BinOp::HIGH_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr AND expr       { $$ = new BinaryOpNode(BinOp::AND, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | expr OR expr        { $$ = new BinaryOpNode(BinOp::OR, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | NOT expr            { $$ = new UnaryOpNode(UnaryOp::NOT, std::unique_ptr<ASTNode>($2)); } // Исправлено: std::unique_ptr
-    | LPAREN expr RPAREN  { $$ = $2; }
+    | expr LOW expr         { $$ = new BinaryOpNode(BinOp::LOW, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr HIGH expr        { $$ = new BinaryOpNode(BinOp::HIGH, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr LOW_EQ expr      { $$ = new BinaryOpNode(BinOp::LOW_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr HIGH_EQ expr     { $$ = new BinaryOpNode(BinOp::HIGH_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr AND expr         { $$ = new BinaryOpNode(BinOp::AND, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | expr OR expr          { $$ = new BinaryOpNode(BinOp::OR, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
+    | NOT expr              { $$ = new UnaryOpNode(UnaryOp::NOT, std::unique_ptr<ASTNode>($2)); } // Исправлено: std::unique_ptr
+    | LPAREN expr RPAREN    { $$ = $2; }
     | ID LPAREN args RPAREN { $$ = new CallExprNode($1, std::move(*$3)); delete $3; free($1); }
     ;
 

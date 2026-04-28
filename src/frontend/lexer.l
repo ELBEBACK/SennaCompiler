@@ -11,6 +11,8 @@ extern "C" int yylex();
 %option noyywrap
 %option yylineno
 
+%x COMMENT
+
 %%
 
 [ \t\r\n]+              { }
@@ -53,6 +55,11 @@ extern "C" int yylex();
 "{"                     { return LBRACE; }
 "}"                     { return RBRACE; }
 ","                     { return COMMA; }
+"//".*                  {}
+"/*"                    {BEGIN(COMMENT);}
+<COMMENT>"*/"           {BEGIN(INITIAL);}
+<COMMENT>\n             {}
+<COMMENT>.              {}
 
 .                       { std::cerr << "Unknown character: "
                         << yytext << " at line " << yylineno << std::endl; }

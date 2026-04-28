@@ -1,6 +1,10 @@
 func add(a, b) {
-    return a + b;
+    c = a + b;
+    add(c, b);
+    //penis
 }
-
+/*
 res = add(10, 20);
+
+*/
 print res;
