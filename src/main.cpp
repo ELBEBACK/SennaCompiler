@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <memory>
+#include <filesystem>
 
 #include "ast.hpp"
 #include "dot_print.hpp"
@@ -9,6 +10,9 @@
 extern FILE* yyin;
 extern int yyparse();
 extern std::unique_ptr<BlockNode> rootBlock;
+
+namespace fs = std::filesystem;
+
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -37,7 +41,15 @@ int main(int argc, char** argv) {
         std::cout << "[+] Parsing successful!" << std::endl;
 
         if (emit_ast) {
-            std::ofstream out_file("ast_output.dot");
+
+            std::string file_path = "output/dot/ast_output.dot";
+            fs::path dir_path = fs::path(file_path).parent_path();
+
+            if (!dir_path.empty() && !fs::exists(dir_path)) {
+                fs::create_directories(dir_path);
+            }
+
+            std::ofstream out_file(file_path);
             if (!out_file.is_open()) {
                 std::cerr << "Error: Could not create output dot file." << std::endl;
                 fclose(file);
@@ -50,7 +62,7 @@ int main(int argc, char** argv) {
             rootBlock->accept(dumper);
             dumper.footer_write();
 
-            std::cout << "[+] AST saved to 'ast_output.dot'" << std::endl;
+            std::cout << "[+] AST saved to './output/dot/ast_output.dot'" << std::endl;
         }
     } else {
         std::cerr << "[-] Parsing failed due to syntax errors." << std::endl;
