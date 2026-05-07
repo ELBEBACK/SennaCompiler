@@ -23,7 +23,9 @@ enum class BinOp {
 };
 
 enum class UnaryOp {
-    NOT
+    NOT,
+    INC,
+    DEC
 };
 
 enum class CycleFunc {

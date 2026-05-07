@@ -51,10 +51,10 @@ void SemanticAnalyzer::visit(BinaryOpNode& node) {
     node.left->accept(*this);
     node.right->accept(*this);
 }
-
+/*
 void SemanticAnalyzer::visit(UnaryOpNode& node) {
     node.operand->accept(*this);
-}
+}*/
 
 void SemanticAnalyzer::visit(PrintNode& node) {
     node.expr->accept(*this);
@@ -141,5 +141,26 @@ void SemanticAnalyzer::visit(BreakNode& node) {
 void SemanticAnalyzer::visit(ContinueNode& node) {
     if(loop_depth == 0) {
         report_error("continue not within");
+    }
+}
+
+void SemanticAnalyzer::visit(CompoundAssignNode& node) {
+    node.expr->accept(*this);
+
+    if (!resolve_symbol(node.var_name)) {
+        report_error("Cannot use compound assignment on undefined variable '" + node.var_name + "'");
+    }
+}
+
+void SemanticAnalyzer::visit(UnaryOpNode& node) {
+    node.operand->accept(*this);
+
+    if (node.op == UnaryOp::INC || node.op == UnaryOp::DEC) {
+        VariableNode* var = dynamic_cast<VariableNode*>(node.operand.get());
+        if (!var) {
+            report_error("Increment/Decrement can only be applied to variables");
+        } else if (!resolve_symbol(var->name)) {
+            report_error("Undefined variable '" + var->name + "' in increment");
+        }
     }
 }
