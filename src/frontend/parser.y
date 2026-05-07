@@ -11,6 +11,8 @@ void yyerror(const char* s);
 std::unique_ptr<BlockNode> rootBlock;
 %}
 
+%locations
+
 %union {
     long long num;
     char* str;
@@ -159,5 +161,7 @@ expr:
 %%
 
 void yyerror(const char* s) {
-    std::cerr << "Parse error at line " << yylineno << ": " << s << std::endl;
+    std::cerr << "Parse error at line " << yylloc.first_line
+              << ", column " << yylloc.first_column
+              << ": " << s << std::endl;
 }

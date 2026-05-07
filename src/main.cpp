@@ -6,6 +6,7 @@
 
 #include "ast.hpp"
 #include "dot_print.hpp"
+#include "semantic.hpp"
 
 extern FILE* yyin;
 extern int yyparse();
@@ -39,6 +40,16 @@ int main(int argc, char** argv) {
 
     if (yyparse() == 0) {
         std::cout << "[+] Parsing successful!" << std::endl;
+
+        SemanticAnalyzer semantic_checker;
+        rootBlock->accept(semantic_checker);
+
+        if (semantic_checker.has_errors()) {
+            std::cerr << "[-] Semantic compilation failed due to errors above." << std::endl;
+            fclose(file);
+            return 1;
+        }
+        std::cout << "[+] Semantic analysis passed!" << std::endl;
 
         if (emit_ast) {
 

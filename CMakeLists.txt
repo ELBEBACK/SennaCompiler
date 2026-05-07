@@ -45,6 +45,7 @@ add_flex_bison_dependency(MyLexer MyParser)
 add_executable(senna
     src/main.cpp
     src/graph_dump/dot_print.cpp
+    src/frontend/semantic.cpp
     ${FLEX_MyLexer_OUTPUTS}
     ${BISON_MyParser_OUTPUTS}
 )

@@ -6,6 +6,15 @@
 #include <iostream>
 
 extern "C" int yylex();
+
+
+int yycolumn = 1;
+
+#define YY_USER_ACTION \
+    yylloc.first_line = yylloc.last_line = yylineno; \
+    yylloc.first_column = yycolumn; \
+    yylloc.last_column = yycolumn + yyleng - 1; \
+    yycolumn += yyleng;
 %}
 
 %option noyywrap
@@ -15,7 +24,8 @@ extern "C" int yylex();
 
 %%
 
-[ \t\r\n]+              { }
+[ \t\r]+                { }
+\n                      { yycolumn = 1; }
 
 "print"                 { return PRINT; }
 "if"                    { return IF; }
@@ -63,10 +73,10 @@ extern "C" int yylex();
 "//".*                  {}
 "/*"                    {BEGIN(COMMENT);}
 <COMMENT>"*/"           {BEGIN(INITIAL);}
-<COMMENT>\n             {}
+<COMMENT>\n             { yycolumn = 1; }
 <COMMENT>.              {}
 
 .                       { std::cerr << "Unknown character: "
-                        << yytext << " at line " << yylineno << std::endl; }
+                        << yytext << " at line " << yylineno << " column " << yycolumn << std::endl; }
 
 %%
