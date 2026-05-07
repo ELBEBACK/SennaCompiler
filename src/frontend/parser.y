@@ -30,6 +30,7 @@ std::unique_ptr<BlockNode> rootBlock;
 %token EQ_ASSIGN NEQ_ASSIGN LOW_EQ HIGH_EQ AND OR LOW HIGH ADD SUB MUL DIV MOD
 %token ASSIGN SEMICOLON LPAREN RPAREN LBRACE RBRACE
 %token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
+%token INC DEC
 
 %left OR
 %left AND
@@ -59,25 +60,10 @@ statement:
         $$ = new PrintNode(std::unique_ptr<ASTNode>($2));
     }
     | expr SEMICOLON { $$ = $1; }
-    | IF LPAREN expr RPAREN compound_statement {
-        $$ = new IfStmtNode(std::unique_ptr<ASTNode>($3),
-                            std::unique_ptr<ASTNode>($5));
-    }
-    | IF LPAREN expr RPAREN compound_statement ELSE compound_statement {
-        $$ = new IfStmtNode(std::unique_ptr<ASTNode>($3),
-                            std::unique_ptr<ASTNode>($5),
-                            std::unique_ptr<ASTNode>($7));
-    }
-    | WHILE LPAREN expr RPAREN compound_statement {
-        $$ = new WhileStmtNode(std::unique_ptr<ASTNode>($3),
-                               std::unique_ptr<ASTNode>($5));
-    }
-    | FOR LPAREN expr SEMICOLON expr SEMICOLON expr RPAREN compound_statement {
-        $$ = new ForNode(std::unique_ptr<ASTNode>($3),
-                         std::unique_ptr<ASTNode>($5),
-                         std::unique_ptr<ASTNode>($7),
-                         std::unique_ptr<ASTNode>($9));
-    }
+    | IF LPAREN expr RPAREN compound_statement { $$ = new IfStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5));}
+    | IF LPAREN expr RPAREN compound_statement ELSE compound_statement { $$ = new IfStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5), std::unique_ptr<ASTNode>($7));}
+    | WHILE LPAREN expr RPAREN compound_statement { $$ = new WhileStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5));}
+    | FOR LPAREN expr SEMICOLON expr SEMICOLON expr RPAREN compound_statement { $$ = new ForNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5), std::unique_ptr<ASTNode>($7), std::unique_ptr<ASTNode>($9));}
     | fn_decl { $$ = $1; }
     | return_stmt { $$ = $1; }
     | BREAK SEMICOLON { $$ = new BreakNode(); }
@@ -142,47 +128,35 @@ expr:
     | expr HIGH_EQ expr     { $$ = new BinaryOpNode(BinOp::HIGH_EQ, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr AND expr         { $$ = new BinaryOpNode(BinOp::AND, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr OR expr          { $$ = new BinaryOpNode(BinOp::OR, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
-    | NOT expr              { $$ = new UnaryOpNode(UnaryOp::NOT, std::unique_ptr<ASTNode>($2)); } // Исправлено: std::unique_ptr
+    | NOT expr              { $$ = new UnaryOpNode(UnaryOp::NOT, std::unique_ptr<ASTNode>($2)); }
+    | ID INC {
+        $$ = new UnaryOpNode(UnaryOp::INC, std::make_unique<VariableNode>($1));
+        free($1);
+    }
+    | ID DEC {
+        $$ = new UnaryOpNode(UnaryOp::DEC, std::make_unique<VariableNode>($1));
+        free($1);
+    }
     | LPAREN expr RPAREN    { $$ = $2; }
     | ID LPAREN args RPAREN { $$ = new CallExprNode($1, std::move(*$3)); delete $3; free($1); }
     | ID ADD_ASSIGN expr {
-        auto current_var = std::make_unique<VariableNode>($1);
-        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::ADD,
-                                                     std::move(current_var),
-                                                     std::unique_ptr<ASTNode>($3));
-        $$ = new AssignmentNode($1, std::move(bin_op));
+        $$ = new CompoundAssignNode($1, BinOp::ADD_ASSIGN, std::unique_ptr<ASTNode>($3));
         free($1);
     }
     | ID SUB_ASSIGN expr {
-        auto current_var = std::make_unique<VariableNode>($1);
-        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::SUB,
-                                                     std::move(current_var),
-                                                     std::unique_ptr<ASTNode>($3));
-        $$ = new AssignmentNode($1, std::move(bin_op));
+        $$ = new CompoundAssignNode($1, BinOp::SUB_ASSIGN, std::unique_ptr<ASTNode>($3));
         free($1);
     }
     | ID MUL_ASSIGN expr {
-        auto current_var = std::make_unique<VariableNode>($1);
-        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::MUL,
-                                                     std::move(current_var),
-                                                     std::unique_ptr<ASTNode>($3));
-        $$ = new AssignmentNode($1, std::move(bin_op));
+        $$ = new CompoundAssignNode($1, BinOp::MUL_ASSIGN, std::unique_ptr<ASTNode>($3));
         free($1);
     }
     | ID DIV_ASSIGN expr {
-        auto current_var = std::make_unique<VariableNode>($1);
-        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::DIV,
-                                                     std::move(current_var),
-                                                     std::unique_ptr<ASTNode>($3));
-        $$ = new AssignmentNode($1, std::move(bin_op));
+        $$ = new CompoundAssignNode($1, BinOp::DIV_ASSIGN, std::unique_ptr<ASTNode>($3));
         free($1);
     }
     | ID MOD_ASSIGN expr {
-        auto current_var = std::make_unique<VariableNode>($1);
-        auto bin_op = std::make_unique<BinaryOpNode>(BinOp::MOD,
-                                                     std::move(current_var),
-                                                     std::unique_ptr<ASTNode>($3));
-        $$ = new AssignmentNode($1, std::move(bin_op));
+        $$ = new CompoundAssignNode($1, BinOp::MOD_ASSIGN, std::unique_ptr<ASTNode>($3));
         free($1);
     }
     | ID ASSIGN expr {

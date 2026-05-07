@@ -195,3 +195,14 @@ void GraphDump::visit(WhileStmtNode& node) {
 
     cur_node_id = id;
 }
+
+void GraphDump::visit(CompoundAssignNode& node) {
+    int id = next_id();
+
+    os << "  node" << id << " [label=\"CompAssign: " << node.var_name << " " << get_op(node.op) << "\", fillcolor=lightcoral];\n";
+
+    node.expr->accept(*this);
+    edge_write(id, cur_node_id);
+
+    cur_node_id = id;
+}

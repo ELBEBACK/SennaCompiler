@@ -9,7 +9,7 @@ func add(a, b) {
     }
 }
 
-for(e = 0; e < 1; e = e + 1) {
+for(e = 0; e < 1; e++) {
     c = add(1, 2);
 }
 
