@@ -20,6 +20,8 @@ std::unique_ptr<BlockNode> rootBlock;
     std::vector<std::unique_ptr<ASTNode>>* args;
 }
 
+%destructor { free($$); } <str>
+
 %token <num> NUM
 %token <str> ID
 %token FN RETURN ARROW COMMA PRINT IF ELSE WHILE
