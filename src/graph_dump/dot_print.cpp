@@ -85,18 +85,6 @@ void GraphDump::visit(IfStmtNode& node) {
     cur_node_id = id;
 }
 
-void GraphDump::visit(WhileStmtNode& node) {
-    int id = next_id();
-    os << "  node" << id << " [label=\"While\", fillcolor=lightcoral];\n";
-
-    node.condition->accept(*this);
-    edge_write(id, cur_node_id);
-
-    node.body->accept(*this);
-    edge_write(id, cur_node_id);
-
-    cur_node_id = id;
-}
 
 std::string GraphDump::get_op(const BinOp& op) const {
     switch(op) {
@@ -174,4 +162,36 @@ void GraphDump::visit(BreakNode& node) {
 void GraphDump::visit(ContinueNode& node) {
     cur_node_id = next_id();
     os << "  node" << cur_node_id << " [label=\"continue\", fillcolor=firebrick1];\n";
+}
+
+void GraphDump::visit(ForNode& node) {
+    int id = next_id();
+    os << "  node" << id << "  [label=\"For\", fillcolor=cornflowerblue];\n";
+
+    node.init->accept(*this);
+    edge_write(id, cur_node_id);
+
+    node.cond->accept(*this);
+    edge_write(id, cur_node_id);
+
+    node.step->accept(*this);
+    edge_write(id, cur_node_id);
+
+    node.body->accept(*this);
+    edge_write(id, cur_node_id);
+
+    cur_node_id = id;
+}
+
+void GraphDump::visit(WhileStmtNode& node) {
+    int id = next_id();
+    os << "  node" << id << " [label=\"While\", fillcolor=lightcoral];\n";
+
+    node.condition->accept(*this);
+    edge_write(id, cur_node_id);
+
+    node.body->accept(*this);
+    edge_write(id, cur_node_id);
+
+    cur_node_id = id;
 }

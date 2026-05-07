@@ -35,6 +35,7 @@ int yycolumn = 1;
 "return"                { return RETURN; }
 "break"                 { return BREAK; }
 "continue"              { return CONTINUE; }
+"for"                   { return FOR; }
 
 [0-9]+                  {
                             yylval.num = std::atoll(yytext);

@@ -43,4 +43,5 @@ public:
     void visit(ReturnStmtNode& node) override;
     void visit(BreakNode& node) override;
     void visit(ContinueNode& node) override;
+    void visit(ForNode& node) override;
 };

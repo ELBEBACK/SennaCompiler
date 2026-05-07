@@ -84,6 +84,20 @@ void SemanticAnalyzer::visit(WhileStmtNode& node) {
     loop_depth--;
 }
 
+void SemanticAnalyzer::visit(ForNode& node) {
+    enter_scope();
+
+    node.init->accept(*this);
+    node.cond->accept(*this);
+    node.step->accept(*this);
+
+    loop_depth++;
+    node.body->accept(*this);
+    loop_depth--;
+
+    exit_scope();
+}
+
 void SemanticAnalyzer::visit(FnDeclNode& node) {
     if (scopes.back().count(node.name)) {
         report_error("Function '" + node.name + "' is already defined in this scope.");

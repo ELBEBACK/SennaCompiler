@@ -19,6 +19,7 @@ class CallExprNode;
 class ReturnStmtNode;
 class BreakNode;
 class ContinueNode;
+class ForNode;
 
 class IVisitor {
 public:
@@ -37,6 +38,7 @@ public:
     virtual void visit(ReturnStmtNode& node) = 0;
     virtual void visit(BreakNode& node) = 0;
     virtual void visit(ContinueNode& node) = 0;
+    virtual void visit(ForNode& node) = 0;
 };
 
 class ASTNode {
@@ -175,5 +177,20 @@ public:
 
 class ContinueNode : public ASTNode {
 public:
+    void accept(IVisitor& visitor) override { visitor.visit(*this); }
+};
+
+class ForNode : public ASTNode {
+public:
+    std::unique_ptr<ASTNode> init;
+    std::unique_ptr<ASTNode> cond;
+    std::unique_ptr<ASTNode> step;
+    std::unique_ptr<ASTNode> body;
+
+    ForNode(std::unique_ptr<ASTNode> init, std::unique_ptr<ASTNode> cond,
+            std::unique_ptr<ASTNode> step, std::unique_ptr<ASTNode> body) :
+        init(std::move(init)), cond(std::move(cond)),
+        step(std::move(step)), body(std::move(body)) {}
+
     void accept(IVisitor& visitor) override { visitor.visit(*this); }
 };
