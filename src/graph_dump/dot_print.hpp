@@ -24,7 +24,10 @@ public:
     void visit(UnaryOpNode& node) override;
     void visit(CallExprNode& node) override;
     void visit(ReturnStmtNode& node) override;
+    void visit(BreakNode& node) override;
+    void visit(ContinueNode& node) override;
     void footer_write() const;
+
 private:
     int  next_id() {return ++node_cnt;}
     void edge_write(int from, int to) const;

@@ -33,6 +33,8 @@ int yycolumn = 1;
 "while"                 { return WHILE; }
 "func"                  { return FN; }
 "return"                { return RETURN; }
+"break"                 { return BREAK; }
+"continue"              { return CONTINUE; }
 
 [0-9]+                  {
                             yylval.num = std::atoll(yytext);

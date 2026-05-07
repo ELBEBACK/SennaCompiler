@@ -26,7 +26,7 @@ std::unique_ptr<BlockNode> rootBlock;
 
 %token <num> NUM
 %token <str> ID
-%token FN RETURN ARROW COMMA PRINT IF ELSE WHILE
+%token FN RETURN ARROW COMMA PRINT IF ELSE WHILE BREAK CONTINUE
 %token EQ_ASSIGN NEQ_ASSIGN LOW_EQ HIGH_EQ AND OR LOW HIGH ADD SUB MUL DIV MOD
 %token ASSIGN SEMICOLON LPAREN RPAREN LBRACE RBRACE
 %token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
@@ -63,6 +63,8 @@ statement:
     | WHILE LPAREN expr RPAREN compound_statement { $$ = new WhileStmtNode(std::unique_ptr<ASTNode>($3), std::unique_ptr<ASTNode>($5)); }
     | fn_decl { $$ = $1; }
     | return_stmt { $$ = $1; }
+    | BREAK SEMICOLON { $$ = new BreakNode(); }
+    | CONTINUE SEMICOLON { $$ = new ContinueNode(); }
     | ID ADD_ASSIGN expr SEMICOLON {
         auto current_var = std::make_unique<VariableNode>($1);
         auto bin_op = std::make_unique<BinaryOpNode>(BinOp::ADD, std::move(current_var), std::unique_ptr<ASTNode>($3));

@@ -14,6 +14,7 @@ class SemanticAnalyzer : public IVisitor {
 private:
     std::vector<std::unordered_map<std::string, SymbolInfo>> scopes;
     bool has_error = false;
+    int loop_depth = 0;
 
     void enter_scope();
     void exit_scope();
@@ -40,4 +41,6 @@ public:
     void visit(FnDeclNode& node) override;
     void visit(CallExprNode& node) override;
     void visit(ReturnStmtNode& node) override;
+    void visit(BreakNode& node) override;
+    void visit(ContinueNode& node) override;
 };

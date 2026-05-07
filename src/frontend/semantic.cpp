@@ -78,7 +78,10 @@ void SemanticAnalyzer::visit(IfStmtNode& node) {
 
 void SemanticAnalyzer::visit(WhileStmtNode& node) {
     node.condition->accept(*this);
+
+    loop_depth++;
     node.body->accept(*this);
+    loop_depth--;
 }
 
 void SemanticAnalyzer::visit(FnDeclNode& node) {
@@ -113,5 +116,16 @@ void SemanticAnalyzer::visit(CallExprNode& node) {
 void SemanticAnalyzer::visit(ReturnStmtNode& node) {
     if (node.expr) {
         node.expr->accept(*this);
+    }
+}
+
+void SemanticAnalyzer::visit(BreakNode& node) {
+    if(loop_depth == 0) {
+        report_error("break not within a loop");
+    }
+}
+void SemanticAnalyzer::visit(ContinueNode& node) {
+    if(loop_depth == 0) {
+        report_error("continue not within");
     }
 }

@@ -17,6 +17,8 @@ class UnaryOpNode;
 class FnDeclNode;
 class CallExprNode;
 class ReturnStmtNode;
+class BreakNode;
+class ContinueNode;
 
 class IVisitor {
 public:
@@ -33,6 +35,8 @@ public:
     virtual void visit(FnDeclNode& node) = 0;
     virtual void visit(CallExprNode& node) = 0;
     virtual void visit(ReturnStmtNode& node) = 0;
+    virtual void visit(BreakNode& node) = 0;
+    virtual void visit(ContinueNode& node) = 0;
 };
 
 class ASTNode {
@@ -161,5 +165,15 @@ class ReturnStmtNode : public ASTNode {
 public:
     std::unique_ptr<ASTNode> expr;
     explicit ReturnStmtNode(std::unique_ptr<ASTNode> e) : expr(std::move(e)) {}
+    void accept(IVisitor& visitor) override { visitor.visit(*this); }
+};
+
+class BreakNode : public ASTNode {
+public:
+    void accept(IVisitor& visitor) override { visitor.visit(*this); }
+};
+
+class ContinueNode : public ASTNode {
+public:
     void accept(IVisitor& visitor) override { visitor.visit(*this); }
 };

@@ -165,3 +165,13 @@ void GraphDump::visit(FnDeclNode& node) {
     edge_write(id, cur_node_id);
     cur_node_id = id;
 }
+
+void GraphDump::visit(BreakNode& node) {
+    cur_node_id = next_id();
+    os << "  node" << cur_node_id << " [label=\"break\", fillcolor=firebrick1];\n";
+}
+
+void GraphDump::visit(ContinueNode& node) {
+    cur_node_id = next_id();
+    os << "  node" << cur_node_id << " [label=\"continue\", fillcolor=firebrick1];\n";
+}
