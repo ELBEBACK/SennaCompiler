@@ -18,9 +18,8 @@ void SemanticAnalyzer::define_symbol(const std::string& name, bool is_function) 
 
 bool SemanticAnalyzer::resolve_symbol(const std::string& name) {
     for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
-        if (it->find(name) != it->end()) {
+        if (it->find(name) != it->end())
             return true;
-        }
     }
     return false;
 }
@@ -51,10 +50,6 @@ void SemanticAnalyzer::visit(BinaryOpNode& node) {
     node.left->accept(*this);
     node.right->accept(*this);
 }
-/*
-void SemanticAnalyzer::visit(UnaryOpNode& node) {
-    node.operand->accept(*this);
-}*/
 
 void SemanticAnalyzer::visit(PrintNode& node) {
     node.expr->accept(*this);
