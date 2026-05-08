@@ -113,7 +113,15 @@ std::string GraphDump::get_op(const BinOp& op) const {
 
 void GraphDump::visit(UnaryOpNode& node) {
     int id = next_id();
-    os << "  node" << id << " [label=\"Unary: !\", fillcolor=vividviolet];\n";
+
+    std::string label = {};
+    switch(node.op) {
+        case UnaryOp::NOT: label = "!"; break;
+        case UnaryOp::INC: label = "++"; break;
+        case UnaryOp::DEC: label = "--"; break;
+        default: label = "undef unop"; break;
+    }
+    os << "  node" << id << " [label=\"UnOp: " << label << "\", fillcolor=violet];\n";
     node.operand->accept(*this);
     edge_write(id, cur_node_id);
     cur_node_id = id;
