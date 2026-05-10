@@ -13,7 +13,7 @@ install: build
 	cmake --install $(BUILD_DIR) --prefix $(PREFIX)
 
 dot:
-	./scripts/dot_to_png.sh
+	./scripts/dot2png.sh
 
 clean:
 	rm -rf $(BUILD_DIR) output/
