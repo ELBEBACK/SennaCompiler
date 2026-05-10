@@ -11,15 +11,24 @@ SennaC is a from-scratch compiler where every major algorithm of frontend and mi
 SennaC is **C with a different surface syntax**. The type system, memory model, calling convention, and runtime behavior are identical to C. Only the way you write programs differs.
 
 ```
-func fib(n) {
-    if (n < 2) {
-        return n;
+func add(a, b) {
+    c = a + b;
+    c += 1;
+    add(c, b);
+    while( c > 2) {
+        if(a == 1) {
+            break;
+        }
     }
-    return fib(n - 1) + fib(n - 2);
 }
 
-x = fib(10);
-print x;
+for(e = 0; e < 1; e++) {
+    c = add(1, 2);
+}
+
+res = add(10, 20);
+
+print res;
 ```
 
 ### What stays the same as C

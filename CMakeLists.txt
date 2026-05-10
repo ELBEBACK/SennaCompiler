@@ -49,3 +49,6 @@ add_executable(senna
     ${FLEX_MyLexer_OUTPUTS}
     ${BISON_MyParser_OUTPUTS}
 )
+install(TARGETS senna
+    RUNTIME DESTINATION bin
+)

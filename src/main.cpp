@@ -7,6 +7,7 @@
 #include "ast.hpp"
 #include "dot_print.hpp"
 #include "semantic.hpp"
+#include "flags.hpp"
 
 extern FILE* yyin;
 extern int yyparse();
@@ -16,21 +17,19 @@ namespace fs = std::filesystem;
 
 
 int main(int argc, char** argv) {
+<<<<<<< Updated upstream
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <input_file.sn> [--emit=ast]" << std::endl;
         return 1;
     }
+=======
+    
+    const CliOptions opts = parse_args(argc, argv);
+>>>>>>> Stashed changes
 
-    std::string input_file = argv[1];
-    bool emit_ast = false;
-
-    if (argc > 2 && std::string(argv[2]) == "--emit=ast") {
-        emit_ast = true;
-    }
-
-    FILE* file = fopen(input_file.c_str(), "r");
+    FILE* file = fopen(opts.input_file.c_str(), "r");
     if (!file) {
-        std::cerr << "Error: Could not open file " << input_file << std::endl;
+        std::cerr << "senna: cannot open '" << opts.input_file << "'\n";
         return 1;
     }
 
@@ -51,7 +50,7 @@ int main(int argc, char** argv) {
         }
         std::cout << "[+] Semantic analysis passed!" << std::endl;
 
-        if (emit_ast) {
+        if (opts.has_emit(EmitTarget::AST)) {
 
             std::string file_path = "output/dot/ast_output.dot";
             fs::path dir_path = fs::path(file_path).parent_path();
@@ -76,9 +75,13 @@ int main(int argc, char** argv) {
             std::cout << "[+] AST saved to './output/dot/ast_output.dot'" << std::endl;
         }
     } else {
-        std::cerr << "[-] Parsing failed due to syntax errors." << std::endl;
+        std::cerr << "[-] Parsing failed.\n";
         fclose(file);
         return 1;
+    }
+    
+    if (opts.has_emit(EmitTarget::IR)) {
+        std::cout << "[+] IR emit: not yet implemented, but optget seems to work for it\n";
     }
 
     fclose(file);
