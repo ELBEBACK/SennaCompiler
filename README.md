@@ -49,19 +49,19 @@ print res;
 | `/* comment */` | `/* comment */` (same) |
 | `// comment` | `// comment` (same) |
 
+---
 
 ## How to use
 
 
-```sh
-git clone git@github.com:ELBEBACK/SennaCompiler.git
-cd *project/*
-cmake -B build
-cmake --build build
-```
+| Command | Description |
+|---------|-------------|
+| `make` | Build the project |
+| `make install` | Install `senna` to `~/.local/bin` |
+| `make dot` | Convert **.dot** files of `output/dot/` to **.png** in `output/png/` |
+| `make clean` | Wipe `build/` and `output/` |
+| `make uninstall` | Remove `senna` from `~/.local/bin` |
 
-The binary is `build/senna`.
-After successful compilation, the **dot2png.sh** script is provided to transform all existing **.dot** files in **output/dot** into **.png** in **output/png** directory.
 
 ---
 
@@ -81,13 +81,13 @@ senna <source_file> [options]
 
 ```sh
 # Parse and check for syntax errors
-senna program.pcl
+senna program.sn
 
 # Dump AST as DOT graph
-senna program.pcl --emit=ast
+senna program.sn --emit=ast
 
 # Render to PNG (requires Graphviz)
-./dot2png.sh
+make dot
 # or manually:
 dot -Tpng output/dot/ast_output.dot -o ast.png
 ```
@@ -107,7 +107,6 @@ Full menu of what can be implemented. Items will be checked off as they land.
 - [ ] Semantic analysis — symbol table, scope resolution
 - [ ] Type checking
 - [ ] Error recovery in parser
-- [ ] Own DFA and PDA implementation instead of Bison and Flex
 
 ### IR
 - [ ] Three-address IR: `alloca` / `load` / `store` form, `--emit=ir`
