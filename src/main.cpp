@@ -17,15 +17,8 @@ namespace fs = std::filesystem;
 
 
 int main(int argc, char** argv) {
-<<<<<<< Updated upstream
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <input_file.sn> [--emit=ast]" << std::endl;
-        return 1;
-    }
-=======
     
     const CliOptions opts = parse_args(argc, argv);
->>>>>>> Stashed changes
 
     FILE* file = fopen(opts.input_file.c_str(), "r");
     if (!file) {
