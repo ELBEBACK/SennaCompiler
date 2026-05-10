@@ -65,7 +65,7 @@ print res;
 
 ---
 
-## Usage
+### Compilation
 
 ```sh
 senna <source_file> [options]
