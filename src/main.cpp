@@ -77,6 +77,30 @@ int main(int argc, char** argv) {
         std::cout << "[+] IR emit: not yet implemented, but optget seems to work for it\n";
     }
 
+    if (opts.has_emit(EmitTarget::CFG)) {
+        std::cout << "[+] cfg emit: not yet implemented, but optget seems to work for it\n";
+    }
+
+    if (opts.has_emit(EmitTarget::DOM)) {
+        std::cout << "[+] domtree emit: not yet implemented, but optget seems to work for it\n";
+    }
+
+    if (opts.has_emit(EmitTarget::FDOM)) {
+        std::cout << "[+] dom frontiers emit: not yet implemented, but optget seems to work for it\n";
+    }
+
+    if (opts.has_emit(EmitTarget::SSA)) {
+        std::cout << "[+] SSA IR emit: not yet implemented, but optget seems to work for it\n";
+    }
+
+    if (opts.has_emit(EmitTarget::LOOPS)) {
+        std::cout << "[+] looptree emit: not yet implemented, but optget seems to work for it\n";
+    }
+
+    if (opts.has_emit(EmitTarget::LLVM)) {
+        std::cout << "[+] .ll emit: not yet implemented, but optget seems to work for it\n";
+    }
+
     fclose(file);
     return 0;
 }

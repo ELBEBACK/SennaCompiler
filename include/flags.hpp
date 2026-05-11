@@ -5,11 +5,18 @@
 #include <getopt.h>
 #include <iostream>
 #include <unistd.h>
+#include <sstream>
 
 
 enum class EmitTarget {
     AST,
     IR,
+    CFG,
+    DOM,
+    FDOM,
+    SSA,
+    LOOPS,
+    LLVM,
 };
 
 struct CliOptions {
@@ -41,10 +48,10 @@ inline std::vector<std::string> split_csv(const std::string& s) {
 }
     
 
-const bool use_color = isatty(STDERR_FILENO);
+inline const bool use_color = isatty(STDERR_FILENO);
 
-const char* bold  = use_color ? "\033[1m" : "";
-const char* reset = use_color ? "\033[0m" : "";
+inline const char* bold  = use_color ? "\033[1m" : "";
+inline const char* reset = use_color ? "\033[0m" : "";
 
 static void print_usage(const char* name) {
     std::cerr 
@@ -53,8 +60,14 @@ static void print_usage(const char* name) {
     << "\n"
     << bold << "Options:" << reset << "\n"
     << "  " << bold << "--emit=<targets>" << reset << "    Comma-separated list of emit targets:\n"
-    << "                        ast    Dump AST as Graphviz .dot file\n"
-    << "                        ir     Dump intermediate representation\n"
+    << "                        ast    AST as Graphviz DOT\n"
+    << "                        ir     Three-address IR before SSA\n"
+    << "                        cfg    CFG as Graphviz DOT\n"
+    << "                        dom    Dominator tree as Graphviz DOT\n"
+    << "                        fdom   Dominance frontiers as Graphviz DOT\n"
+    << "                        ssa    IR after mem2reg, in SSA form\n"
+    << "                        loops  Loop nesting tree as Graphviz DOT\n"
+    << "                        llvm   LLVM IR text, ready for llc\n"
     << "  " << bold << "-h, --help" << reset << "          Manual message\n\n";
 }
 
@@ -75,8 +88,15 @@ inline CliOptions parse_args(int argc, char** argv) {
         switch (c) {
             case 'e':
                 for (const auto& t : clinterface::split_csv(optarg)) {
-                    if      (t == "ast") opts.emit_targets.push_back(EmitTarget::AST);
-                    else if (t == "ir")  opts.emit_targets.push_back(EmitTarget::IR);
+                    if      (t == "ast")    opts.emit_targets.push_back(EmitTarget::AST);
+                    else if (t == "ir")     opts.emit_targets.push_back(EmitTarget::IR);
+                    else if (t == "cfg")    opts.emit_targets.push_back(EmitTarget::CFG);
+                    else if (t == "dom")    opts.emit_targets.push_back(EmitTarget::DOM);
+                    else if (t == "fdom")   opts.emit_targets.push_back(EmitTarget::FDOM);
+                    else if (t == "ssa")    opts.emit_targets.push_back(EmitTarget::SSA);
+                    else if (t == "loops")  opts.emit_targets.push_back(EmitTarget::LOOPS);
+                    else if (t == "llvm")   opts.emit_targets.push_back(EmitTarget::LLVM);
+
                     else {
                         std::cerr << "senna: unknown emit target '" << t << "'\n";
                         clinterface::print_usage(argv[0]);
