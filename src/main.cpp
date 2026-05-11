@@ -17,7 +17,7 @@ namespace fs = std::filesystem;
 
 
 int main(int argc, char** argv) {
-    
+
     const CliOptions opts = parse_args(argc, argv);
 
     FILE* file = fopen(opts.input_file.c_str(), "r");
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
         fclose(file);
         return 1;
     }
-    
+
     if (opts.has_emit(EmitTarget::IR)) {
         std::cout << "[+] IR emit: not yet implemented, but optget seems to work for it\n";
     }
