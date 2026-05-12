@@ -1,4 +1,5 @@
 #include "ir.hpp"
+#include <algorithm>
 
 static bool has_result(Opcode op) {
     switch (op) {
@@ -52,4 +53,15 @@ Instruction* Function::emit_named(BasicBlock* bb, std::string nm, Opcode op, std
 Instruction* Function::emit(BasicBlock* bb, Opcode op, std::vector<Value*> ops) {
     std::string nm = has_result(op) ? fresh_temp() : "";
     return emit_named(bb, std::move(nm), op, std::move(ops));
+}
+
+void Function::prune_dead_blocks() {
+    blocks.erase(
+        std::remove_if(blocks.begin(), blocks.end(),
+            [this](const std::unique_ptr<BasicBlock>& bb) {
+                return bb.get() != entry
+                    && bb->preds.empty()
+                    && bb->insts.empty();
+            }),
+        blocks.end());
 }

@@ -107,6 +107,7 @@ Module IRBuilder::build(BlockNode& root) {
     if (!terminated())
         cur_fn_->emit(cur_bb_, Opcode::RET, {});
 
+    cur_fn_->prune_dead_blocks();
     module_.functions.push_back(std::move(fn));
     return std::move(module_);
 }
@@ -202,16 +203,16 @@ void IRBuilder::visit(IfStmtNode& node) {
 
     set_block(true_bb);
     node.true_block->accept(*this);
-    if (!terminated()) {
-        cur_fn_->emit(cur_bb_, Opcode::JMP, {})->bb1 = merge_bb;
-        cur_bb_->add_edge(merge_bb);
+    if (!true_bb->is_terminated()) {
+        cur_fn_->emit(true_bb, Opcode::JMP, {})->bb1 = merge_bb;
+        true_bb->add_edge(merge_bb);
     }
 
     set_block(false_bb);
     if (node.false_block) node.false_block->accept(*this);
-    if (!terminated()) {
-        cur_fn_->emit(cur_bb_, Opcode::JMP, {})->bb1 = merge_bb;
-        cur_bb_->add_edge(merge_bb);
+    if (!false_bb->is_terminated()) {
+        cur_fn_->emit(false_bb, Opcode::JMP, {})->bb1 = merge_bb;
+        false_bb->add_edge(merge_bb);
     }
 
     set_block(merge_bb);
@@ -315,6 +316,7 @@ void IRBuilder::visit(FnDeclNode& node) {
     if (!terminated())
         cur_fn_->emit(cur_bb_, Opcode::RET, {});
 
+    cur_fn_->prune_dead_blocks();
     module_.functions.push_back(std::move(fn));
 
     cur_fn_  = s_fn;

@@ -79,6 +79,7 @@ public:
     IrParam*     add_param(const std::string& name);
     Instruction* emit(BasicBlock* bb, Opcode op, std::vector<Value*> ops = {});
     Instruction* emit_named(BasicBlock* bb, std::string name, Opcode op, std::vector<Value*> ops = {});
+    void         prune_dead_blocks();
 
 private:
     uint32_t    bb_cnt_   = 0;
