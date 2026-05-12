@@ -6,6 +6,7 @@
 
 extern "C" int yylex();
 extern int yylineno;
+extern std::vector<std::string> syntax_errors;
 void yyerror(const char* s);
 
 std::unique_ptr<BlockNode> rootBlock;
@@ -168,7 +169,6 @@ expr:
 %%
 
 void yyerror(const char* s) {
-    std::cerr << "Parse error at line " << yylloc.first_line
-              << ", column " << yylloc.first_column
-              << ": " << s << std::endl;
+    std::string err = "Parse error at line " + std::to_string(yylloc.first_line) + ": " + s;
+    syntax_errors.push_back(err);
 }

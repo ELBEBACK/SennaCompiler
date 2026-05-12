@@ -13,6 +13,7 @@ struct SymbolInfo {
 
 class SemanticAnalyzer : public IVisitor {
 private:
+    std::vector<std::string> errors_list;
     std::vector<std::unordered_map<std::string, SymbolInfo>> scopes;
     bool has_error  = false;
     int loop_depth  = 0;
@@ -29,7 +30,7 @@ private:
 
 public:
     SemanticAnalyzer();
-
+    const std::vector<std::string>& get_errors() const { return errors_list; }
     bool has_errors() const { return has_error; }
 
     void visit(NumberNode& node)            override;

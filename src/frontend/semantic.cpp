@@ -24,12 +24,6 @@ bool SemanticAnalyzer::resolve_symbol(const std::string& name) {
     return false;
 }
 
-void SemanticAnalyzer::report_error(const std::string& message) {
-    std::cerr << "[-] Semantic Error: " << message << std::endl;
-    has_error = true;
-}
-
-
 void SemanticAnalyzer::visit(NumberNode& node) {}
 
 void SemanticAnalyzer::visit(VariableNode& node) {
@@ -158,4 +152,9 @@ void SemanticAnalyzer::visit(UnaryOpNode& node) {
             report_error("Undefined variable '" + var->name + "' in increment");
         }
     }
+}
+
+void SemanticAnalyzer::report_error(const std::string& message) {
+    error_list.push_back("Semantic Error: " + message); // Сохраняем вместо std::cerr
+    has_error = true;
 }
