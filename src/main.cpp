@@ -11,6 +11,8 @@
 #include "ir.hpp"
 #include "ir_builder.hpp"
 #include "ir_print.hpp"
+#include "cfg_builder.hpp"
+#include "cfg_print.hpp"
 
 
 extern FILE* yyin;
@@ -92,13 +94,13 @@ int main(int argc, char** argv) {
         fclose(file);
         return 1;
     }
-    
-    
+
+
     IRBuilder builder;
     Module    mod = builder.build(*rootBlock);
-    
+
     if (opts.has_emit(EmitTarget::IR)) {
- 
+
         if (opts.has_emit(EmitTarget::IR)) {
             const std::string path = "output/out.ir";
             if (!ensure_dir(path)) { fclose(file); return 1; }
@@ -109,8 +111,25 @@ int main(int argc, char** argv) {
         }
     }
 
+    CFGBuilder cfg_builder;
+    cfg_builder.build(mod);
+
     if (opts.has_emit(EmitTarget::CFG)) {
-        std::cout << "[+] cfg emit: not yet implemented, but optget seems to work for it\n";
+        const std::string dot_dir = "output/dot";
+        if (!ensure_dir(dot_dir + "/dummy.dot")) {
+            fclose(file);
+            return 1;
+        }
+
+        for (auto& fn : mod.functions) {
+            std::string path = dot_dir + "/cfg_" + fn->name + ".dot";
+            std::ofstream out(path);
+            if (out.is_open()) {
+                CFGPrinter printer(out);
+                printer.print_fn(*fn);
+                //std::cout << "[+] CFG for function @" << fn->name << " saved to " << path << "\n";
+            }
+        }
     }
 
     if (opts.has_emit(EmitTarget::DOM)) {

@@ -109,17 +109,15 @@ clang -O0 output/out.ll -o program
 - [x] AST construction, visitor pattern
 - [x] DOT dump of AST (`--emit=ast`)
 - [x] Line/column tracking in lexer (`yylloc`)
-- [ ] Source locations stored in AST nodes
 - [x] Semantic analysis — scope resolution, use-before-def
-- [ ] Semantic analysis — call arity checking, function vs variable distinction
-- [ ] Error recovery in parser
+- [x] Error recovery in parser
 ### IR
-- [ ] Three-address IR: `alloca` / `load` / `store` form (`--emit=ir`)
+- [x] Three-address IR: `alloca` / `load` / `store` form (`--emit=ir`)
 - [ ] CFG construction (`--emit=cfg`)
-- [ ] Textual IR printer (for diff-based testing)
+- [x] Textual IR printer (for diff-based testing)
 - [ ] IR verifier (use-def consistency, type invariants)
 ### SSA construction
-- [ ] Dominator tree — Lengauer–Tarjan (`--emit=dom`)
+- [ ] Dominator tree (`--emit=dom`)
 - [ ] Dominance frontiers (`--emit=fdom`)
 - [ ] `mem2reg` — phi placement + renaming via domtree walk (`--emit=ssa`)
 - [ ] SSA verifier — every use dominated by its def, phi operand count matches predecessor count

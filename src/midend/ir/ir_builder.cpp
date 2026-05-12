@@ -96,7 +96,7 @@ void IRBuilder::setup_allocas(ASTNode* body, const std::vector<IrParam*>& params
 
 Module IRBuilder::build(BlockNode& root) {
     auto fn  = std::make_unique<Function>();
-    fn->name = "<toplevel>";
+    fn->name = "main";
     cur_fn_  = fn.get();
 
     cur_fn_->entry = cur_fn_->new_block("entry");
