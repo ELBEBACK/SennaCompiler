@@ -2,7 +2,7 @@ flex_target(MyLexer frontend/lexer.l ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp)
 bison_target(MyParser frontend/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp)
 add_flex_bison_dependency(MyLexer MyParser)
 
-add_library(senna_compiler SHARED
+add_library(senna_compiler STATIC
     frontend/semantic.cpp
     midend/ir/ir.cpp
     midend/ir/ir_builder.cpp
@@ -16,7 +16,7 @@ add_library(senna_compiler SHARED
 
 target_include_directories(senna_compiler
     PUBLIC
-    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/cli
     ${CMAKE_SOURCE_DIR}/include/frontend
     ${CMAKE_SOURCE_DIR}/include/midend/ir
     ${CMAKE_SOURCE_DIR}/include/midend/cfg
@@ -25,3 +25,8 @@ target_include_directories(senna_compiler
 )
 add_executable(senna main.cpp)
 target_link_libraries(senna PRIVATE senna_compiler)
+
+install(TARGETS senna senna_compiler
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+)

@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
             if (out.is_open()) {
                 CFGPrinter printer(out);
                 printer.print_fn(*fn);
-                //std::cout << "[+] CFG for function @" << fn->name << " saved to " << path << "\n";
+                std::cout << "[+] CFG for function @" << fn->name << " saved to " << path << "\n";
             }
         }
     }
