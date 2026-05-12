@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 
-
 find_package(FLEX QUIET)
 if(NOT FLEX_FOUND)
     message(WARNING "Flex not found. Attempting to install via apt-get...")
@@ -33,24 +32,4 @@ if(NOT BISON_FOUND)
     find_package(BISON REQUIRED)
 endif()
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-flex_target(MyLexer src/frontend/lexer.l ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp)
-bison_target(MyParser src/frontend/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp)
-add_flex_bison_dependency(MyLexer MyParser)
-
-add_executable(senna
-    src/main.cpp
-    src/dumper/dot_print.cpp
-    src/frontend/semantic.cpp
-    src/middle_end/ir.cpp
-    src/middle_end/ir_builder.cpp
-    src/dumper/ir_print.cpp
-    ${FLEX_MyLexer_OUTPUTS}
-    ${BISON_MyParser_OUTPUTS}
-)
-install(TARGETS senna
-    RUNTIME DESTINATION bin
-)
+add_subdirectory(src)
