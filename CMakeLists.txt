@@ -35,7 +35,6 @@ endif()
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/graph_dump
 )
 
 flex_target(MyLexer src/frontend/lexer.l ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp)
@@ -44,8 +43,11 @@ add_flex_bison_dependency(MyLexer MyParser)
 
 add_executable(senna
     src/main.cpp
-    src/graph_dump/dot_print.cpp
+    src/dumper/dot_print.cpp
     src/frontend/semantic.cpp
+    src/middle_end/ir.cpp
+    src/middle_end/ir_builder.cpp
+    src/dumper/ir_print.cpp
     ${FLEX_MyLexer_OUTPUTS}
     ${BISON_MyParser_OUTPUTS}
 )

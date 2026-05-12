@@ -8,12 +8,32 @@
 #include "dot_print.hpp"
 #include "semantic.hpp"
 #include "flags.hpp"
+#include "ir.hpp"
+#include "ir_builder.hpp"
+#include "ir_print.hpp"
+
 
 extern FILE* yyin;
 extern int yyparse(std::vector<std::string>& syntax_errors);
 extern std::unique_ptr<BlockNode> rootBlock;
 
 namespace fs = std::filesystem;
+
+
+static bool ensure_dir(const std::string& file_path) {
+    fs::path dir = fs::path(file_path).parent_path();
+    if (!dir.empty() && !fs::exists(dir)) {
+        std::error_code ec;
+        fs::create_directories(dir, ec);
+        if (ec) {
+            std::cerr << "senna: cannot create '"
+                      << dir.string() << "': " << ec.message() << "\n";
+            return false;
+        }
+    }
+    return true;
+}
+
 
 int main(int argc, char** argv) {
 
@@ -50,11 +70,7 @@ int main(int argc, char** argv) {
         if (opts.has_emit(EmitTarget::AST)) {
 
             std::string file_path = "output/dot/ast_output.dot";
-            fs::path dir_path = fs::path(file_path).parent_path();
-
-            if (!dir_path.empty() && !fs::exists(dir_path)) {
-                fs::create_directories(dir_path);
-            }
+            ensure_dir(file_path);
 
             std::ofstream out_file(file_path);
             if (!out_file.is_open()) {
@@ -69,16 +85,28 @@ int main(int argc, char** argv) {
             rootBlock->accept(dumper);
             dumper.footer_write();
 
-            std::cout << "[+] AST saved to './output/dot/ast_output.dot'" << std::endl;
+            std::cout << "[+] AST has been saved to './output/dot/ast_output.dot'" << std::endl;
         }
     } else {
         std::cerr << "[-] Parsing failed.\n";
         fclose(file);
         return 1;
     }
-
+    
+    
+    IRBuilder builder;
+    Module    mod = builder.build(*rootBlock);
+    
     if (opts.has_emit(EmitTarget::IR)) {
-        std::cout << "[+] IR emit: not yet implemented, but optget seems to work for it\n";
+ 
+        if (opts.has_emit(EmitTarget::IR)) {
+            const std::string path = "output/out.ir";
+            if (!ensure_dir(path)) { fclose(file); return 1; }
+            std::ofstream out(path);
+            IRPrinter printer(out);
+            printer.print(mod);
+            std::cout << "[+] Non-SSA IR has been saved to ./output/out.ir" << "\n";
+        }
     }
 
     if (opts.has_emit(EmitTarget::CFG)) {
