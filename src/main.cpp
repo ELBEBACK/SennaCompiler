@@ -10,15 +10,16 @@
 #include "flags.hpp"
 
 extern FILE* yyin;
-extern int yyparse();
+extern int yyparse(std::vector<std::string>& syntax_errors);
 extern std::unique_ptr<BlockNode> rootBlock;
 
 namespace fs = std::filesystem;
 
-
 int main(int argc, char** argv) {
 
     const CliOptions opts = parse_args(argc, argv);
+
+    std::vector<std::string> syntax_errors;
 
     FILE* file = fopen(opts.input_file.c_str(), "r");
     if (!file) {
@@ -30,7 +31,10 @@ int main(int argc, char** argv) {
 
     rootBlock = std::make_unique<BlockNode>();
 
-    if (yyparse() == 0) {
+    if (yyparse(syntax_errors) == 0) {
+        if (!syntax_errors.empty()) {
+            for (const auto& err : syntax_errors) std::cerr << err << std::endl;
+        }
         std::cout << "[+] Parsing successful!" << std::endl;
 
         SemanticAnalyzer semantic_checker;

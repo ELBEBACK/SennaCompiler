@@ -155,6 +155,6 @@ void SemanticAnalyzer::visit(UnaryOpNode& node) {
 }
 
 void SemanticAnalyzer::report_error(const std::string& message) {
-    error_list.push_back("Semantic Error: " + message); // Сохраняем вместо std::cerr
+    errors_list.push_back("Semantic Error: " + message);
     has_error = true;
 }
