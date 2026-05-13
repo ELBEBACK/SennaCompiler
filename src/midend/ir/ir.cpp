@@ -18,6 +18,10 @@ std::string Function::fresh_temp() {
     return "%t" + std::to_string(temp_cnt_++);
 }
 
+std::string Function::new_temp() {
+    return fresh_temp();
+}
+
 BasicBlock* Function::new_block(const std::string& lbl) {
     auto bb   = std::make_unique<BasicBlock>();
     bb->id    = bb_cnt_++;
@@ -31,6 +35,16 @@ ConstantInt* Function::get_const(int64_t v) {
     auto c = std::make_unique<ConstantInt>(v);
     ConstantInt* p = c.get();
     values.push_back(std::move(c));
+    return p;
+}
+
+UndefValue* Function::get_undef() {
+    for (const auto& v : values)
+        if (dynamic_cast<UndefValue*>(v.get()))
+            return static_cast<UndefValue*>(v.get());
+    auto u  = std::make_unique<UndefValue>();
+    auto* p = u.get();
+    values.push_back(std::move(u));
     return p;
 }
 
@@ -53,6 +67,13 @@ Instruction* Function::emit_named(BasicBlock* bb, std::string nm, Opcode op, std
 Instruction* Function::emit(BasicBlock* bb, Opcode op, std::vector<Value*> ops) {
     std::string nm = has_result(op) ? fresh_temp() : "";
     return emit_named(bb, std::move(nm), op, std::move(ops));
+}
+
+Instruction* Function::make_inst(std::string nm, Opcode op, std::vector<Value*> ops) {
+    auto i = std::make_unique<Instruction>(std::move(nm), op, std::move(ops));
+    Instruction* p = i.get();
+    values.push_back(std::move(i));
+    return p;
 }
 
 void Function::prune_dead_blocks() {

@@ -11,6 +11,7 @@ enum class Opcode {
     AND, OR, NOT,
     CALL, PRINT, READ,
     JMP, BR, RET,
+    PHI,
 };
 
 class Value {
@@ -24,6 +25,11 @@ class ConstantInt : public Value {
 public:
     int64_t val;
     explicit ConstantInt(int64_t v) : val(v) {}
+};
+
+class UndefValue : public Value {
+public:
+    UndefValue() : Value("undef") {}
 };
 
 class IrParam : public Value {
@@ -40,6 +46,8 @@ public:
     std::string         fn_name;
     BasicBlock*         bb1 = nullptr;
     BasicBlock*         bb2 = nullptr;
+
+    std::vector<BasicBlock*> phi_preds;
 
     Instruction(std::string nm, Opcode op, std::vector<Value*> ops = {})
         : Value(std::move(nm)), opcode(op), operands(std::move(ops)) {}
@@ -76,10 +84,16 @@ public:
 
     BasicBlock*  new_block(const std::string& label = "");
     ConstantInt* get_const(int64_t v);
+    UndefValue*  get_undef();
     IrParam*     add_param(const std::string& name);
     Instruction* emit(BasicBlock* bb, Opcode op, std::vector<Value*> ops = {});
     Instruction* emit_named(BasicBlock* bb, std::string name, Opcode op, std::vector<Value*> ops = {});
-    void         prune_dead_blocks();
+
+    Instruction* make_inst(std::string name, Opcode op, std::vector<Value*> ops = {});
+
+    std::string  new_temp();
+
+    void prune_dead_blocks();
 
 private:
     uint32_t    bb_cnt_   = 0;

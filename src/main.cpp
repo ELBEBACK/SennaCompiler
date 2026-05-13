@@ -5,7 +5,7 @@
 #include <filesystem>
 
 #include "ast.hpp"
-#include "dot_print.hpp"
+#include "ast_print.hpp"
 #include "semantic.hpp"
 #include "flags.hpp"
 #include "ir.hpp"
@@ -17,8 +17,7 @@
 #include "dom_tree.hpp"
 #include "dom_front.hpp"
 #include "doms_print.hpp"
-
-
+#include "mem2reg.hpp"
 
 extern FILE* yyin;
 extern int yyparse(std::vector<std::string>& syntax_errors);
@@ -86,7 +85,7 @@ int main(int argc, char** argv) {
                 return 1;
             }
 
-            GraphDump dumper(out_file);
+            ASTPrint dumper(out_file);
 
             dumper.header_write();
             rootBlock->accept(dumper);
@@ -126,7 +125,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    
+
     CFGBuilder cfg_builder;
     cfg_builder.build(mod);
 
@@ -148,6 +147,53 @@ int main(int argc, char** argv) {
         }
     }
 
+    const bool ssa_requested = opts.has_emit(EmitTarget::SSA) || opts.has_emit(EmitTarget::LLVM);
+    const bool dom_requested = opts.has_emit(EmitTarget::DOM) || opts.has_emit(EmitTarget::FDOM);
+
+    if (ssa_requested || dom_requested) {
+        for (auto& fn : mod.functions) {
+            DomTree dom;
+            dom.build(*fn);
+            if (opts.has_emit(EmitTarget::DOM)) {
+                std::string path = "output/dot/dom_" + fn->name + ".dot";
+                ensure_dir(path);
+                std::ofstream out(path);
+                DomTreePrinter printer(out);
+                printer.print(*fn, dom);
+                std::cout << "[+] Dominator tree for @" << fn->name << " saved to " << path << "\n";
+            }
+
+            DomFronts fronts;
+            fronts.build(*fn, dom);
+
+            if (opts.has_emit(EmitTarget::FDOM)) {
+                std::string path = "output/dot/fdom_" + fn->name + ".dot";
+                ensure_dir(path);
+                std::ofstream out(path);
+                DomFrontPrinter printer(out);
+                printer.print(*fn, fronts);
+                std::cout << "[+] Dominance frontiers for @" << fn->name << " saved to " << path << "\n";
+            }
+
+            if (ssa_requested) {
+                Mem2Reg mem2reg;
+                if (mem2reg.run(*fn, dom, fronts)) {
+                    std::cout << "[+] Mem2Reg: successfully promoted @" << fn->name << " to SSA form" << std::endl;
+                }
+            }
+        }
+    }
+
+    if (opts.has_emit(EmitTarget::SSA)) {
+        const std::string path = "output/out.ssa";
+        if (ensure_dir(path)) {
+            std::ofstream out(path);
+            IRPrinter printer(out);
+            printer.print(mod);
+            std::cout << "[+] SSA IR has been saved to " << path << std::endl;
+        }
+    }
+
 
     DomTree   dom;
     DomFronts fronts;
@@ -160,11 +206,11 @@ int main(int argc, char** argv) {
     if (opts.has_emit(EmitTarget::DOM)) {
         const std::string dot_dir = "output/dot";
         if (!ensure_dir(dot_dir + "/dummy.dot")) { fclose(file); return 1; }
- 
+
         for (auto& fn : mod.functions) {
             DomTree per_fn_dom;
             per_fn_dom.build(*fn);
- 
+
             std::string path = dot_dir + "/dom_" + fn->name + ".dot";
             std::ofstream out(path);
             if (out.is_open()) {
@@ -180,14 +226,14 @@ int main(int argc, char** argv) {
     if (opts.has_emit(EmitTarget::FDOM)) {
         const std::string dot_dir = "output/dot";
         if (!ensure_dir(dot_dir + "/dummy.dot")) { fclose(file); return 1; }
- 
+
         for (auto& fn : mod.functions) {
             DomTree per_fn_dom;
             per_fn_dom.build(*fn);
- 
+
             DomFronts per_fn_fronts;
             per_fn_fronts.build(*fn, per_fn_dom);
- 
+
             std::string path = dot_dir + "/fdom_" + fn->name + ".dot";
             std::ofstream out(path);
             if (out.is_open()) {
@@ -199,9 +245,30 @@ int main(int argc, char** argv) {
         }
     }
 
+    const bool need_ssa = opts.has_emit(EmitTarget::SSA)
+                       || opts.has_emit(EmitTarget::LLVM);
+
+    if (need_ssa) {
+        for (auto& fn : mod.functions) {
+            DomTree   dom;
+            DomFronts fronts;
+            dom.build(*fn);
+            fronts.build(*fn, dom);
+
+            Mem2Reg mem2reg;
+            mem2reg.run(*fn, dom, fronts);
+        }
+    }
 
     if (opts.has_emit(EmitTarget::SSA)) {
-        std::cout << "[+] SSA IR emit: not yet implemented, but optget seems to work for it\n";
+        if (opts.has_emit(EmitTarget::SSA)) {
+            const std::string path = "output/out.ssa";
+            if (!ensure_dir(path)) { fclose(file); return 1; }
+            std::ofstream out(path);
+            IRPrinter printer(out);
+            printer.print(mod);
+            std::cout << "[+] SSA IR saved to " << path << "\n";
+        }
     }
 
     if (opts.has_emit(EmitTarget::LOOPS)) {

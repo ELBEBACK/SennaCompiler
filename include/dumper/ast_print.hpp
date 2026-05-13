@@ -4,12 +4,12 @@
 #include <iostream>
 #include <string>
 
-class GraphDump : public IVisitor {
+class ASTPrint : public IVisitor {
     int node_cnt = 0;
     int cur_node_id = 0;
     std::ostream& os;
 public:
-    explicit GraphDump(std::ostream& os) : os(os) {}
+    explicit ASTPrint(std::ostream& os) : os(os) {}
 
     void header_write() const;
     void visit(NumberNode& node) override;
