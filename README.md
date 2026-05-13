@@ -113,13 +113,13 @@ clang -O0 output/out.ll -o program
 - [x] Error recovery in parser
 ### IR
 - [x] Three-address IR: `alloca` / `load` / `store` form (`--emit=ir`)
-- [ ] CFG construction (`--emit=cfg`)
+- [x] CFG construction (`--emit=cfg`)
 - [x] Textual IR printer (for diff-based testing)
-- [ ] IR verifier (use-def consistency, type invariants)
+- [x] IR verifier (use-def consistency, type invariants)
 ### SSA construction
-- [ ] Dominator tree (`--emit=dom`)
-- [ ] Dominance frontiers (`--emit=fdom`)
-- [ ] `mem2reg` — phi placement + renaming via domtree walk (`--emit=ssa`)
+- [x] Dominator tree (`--emit=dom`)
+- [x] Dominance frontiers (`--emit=fdom`)
+- [x] `mem2reg` — phi placement + renaming via domtree walk (`--emit=ssa`)
 - [ ] SSA verifier — every use dominated by its def, phi operand count matches predecessor count
 ### Middle-end — Loop analysis
 - [ ] Natural loop detection (back-edges + dominator tree)
@@ -133,10 +133,10 @@ clang -O0 output/out.ll -o program
 ### Middle-end — Loop optimizations
 - [ ] LICM — loop-invariant code motion
 ### Backend — LLVM IR emitter
-- [ ] Type lowering (own integer types → `i64`, `ptr`)
-- [ ] Phi node lowering (value indices → LLVM block-label operands)
-- [ ] LLVM IR text emitter (`--emit=llvm`)
-- [ ] Subprocess invocation of `llc` / `clang -O0` for final binary
+- [x] Type lowering (own integer types → `i64`, `ptr`)
+- [x] Phi node lowering (value indices → LLVM block-label operands)
+- [x] LLVM IR text emitter (`--emit=llvm`)
+- [x] Invoke `clang -O0` on the emitted `.ll` to output binary 
 ### Debug and tooling
 - [ ] `--explain` — trace pass decisions (phi placement sites, DCE removals, SCCP lattice states)
-- [ ] `make dot` renders all DOT outputs to PNG
+- [x] `make dot` renders all DOT outputs to PNG
