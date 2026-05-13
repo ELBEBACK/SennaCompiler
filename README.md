@@ -52,7 +52,7 @@ for (e = 0; e < 10; e++) {
 |---------|-------------|
 | `make` | Build the project |
 | `make install` | Install `senna` to `~/.local/bin` |
-| `make dot` | Convert **.dot** files of `output/dot/` into **.png** in `output/png/` |
+| `make dot` | Convert **.dot** files in `output/dot/` into **.png** in `output/png/` |
 | `make clean` | Wipe `build/` and `output/` |
 | `make uninstall` | Remove `senna` from `~/.local/bin` |
 
@@ -66,7 +66,7 @@ senna <source_file> [options]
 
 ### Flags
 
-The manual on how to compile may be called via `-h`/`--help` flags. All the output may be controlled via `--emit` combination of the flags
+The manual can be printed with `-h` / `--help`. All output is controlled via `--emit` with a comma-separated list of targets.
 
 | Flag | Output | Description |
 |------|--------|-------------|
@@ -76,14 +76,21 @@ The manual on how to compile may be called via `-h`/`--help` flags. All the outp
 | `--emit=dom` | `output/dot/dom_<fn>.dot` | Dominator tree per function |
 | `--emit=fdom` | `output/dot/fdom_<fn>.dot` | Dominance frontiers per function |
 | `--emit=ssa` | `output/out.ssa` | IR after mem2reg, in SSA form |
-| `--emit=loops` | `output/dot/loops.dot` | Loops nesting tree per function |
-| `--emit=llvm` | `output/out.ll` | LLVM IR text, ready for `llc` |
+| `--emit=loops` | `output/dot/loops_<fn>.dot` | Loop nesting tree per function |
+| `--emit=llvm` | `output/out.ll` | LLVM IR; `clang -O0` is invoked automatically to produce the binary |
+
+### Default mode
+
+Running `senna` with no `--emit` flags compiles straight to a native binary and removes the intermediate `.ll` file afterwards. It is equivalent to `--emit=llvm` without keeping the IR on disk.
 
 ### Examples
 
 ```sh
-# Parse and semantic-check only
+# Compile to native binary (by default intermediate .ll is removed)
 senna program.sn
+
+# Keep the LLVM IR alongside the binary
+senna program.sn --emit=llvm
 
 # Dump intermediate graphs
 senna program.sn --emit=ast,fdom
@@ -92,11 +99,6 @@ make dot                          # render to PNG
 # Inspect IR at each stage
 senna program.sn --emit=ir
 senna program.sn --emit=ssa
-senna program.sn --emit=llvm
-
-# Compile to binary via LLVM
-senna program.sn --emit=llvm
-clang -O0 output/out.ll -o program
 ```
 
 ---
@@ -111,30 +113,36 @@ clang -O0 output/out.ll -o program
 - [x] Line/column tracking in lexer (`yylloc`)
 - [x] Semantic analysis — scope resolution, use-before-def
 - [x] Error recovery in parser
+
 ### IR
 - [x] Three-address IR: `alloca` / `load` / `store` form (`--emit=ir`)
 - [x] CFG construction (`--emit=cfg`)
 - [x] Textual IR printer (for diff-based testing)
 - [x] IR verifier (use-def consistency, type invariants)
+
 ### SSA construction
 - [x] Dominator tree (`--emit=dom`)
 - [x] Dominance frontiers (`--emit=fdom`)
 - [x] `mem2reg` — phi placement + renaming via domtree walk (`--emit=ssa`)
 - [ ] SSA verifier — every use dominated by its def, phi operand count matches predecessor count
+
 ### Middle-end — Loop analysis
 - [ ] Natural loop detection (back-edges + dominator tree)
 - [ ] Loop nesting tree — Havlak's algorithm (`--emit=loops`)
 - [ ] Loop canonicalization — single preheader, single latch, dedicated exits
+
 ### Middle-end — Scalar optimizations
 - [ ] Dead code elimination (DCE)
 - [ ] Constant folding and algebraic simplification
 - [ ] SCCP — sparse conditional constant propagation
 - [ ] GVN — global value numbering
+
 ### Middle-end — Loop optimizations
 - [ ] LICM — loop-invariant code motion
+
 ### Backend — LLVM IR emitter
-- [x] Type lowering (own integer types → `i64`, `ptr`)
-- [x] Phi node lowering (value indices → LLVM block-label operands)
+- [x] Type lowering (all values → `i64`; alloca slots → `i64*` in pre-SSA LLVM IR)
+- [x] Phi node lowering (operands emitted as `[ value, %label ]` pairs)
 - [x] LLVM IR text emitter (`--emit=llvm`)
 - [x] Invoke `clang -O0` on the emitted `.ll` to output binary 
 ### Debug and tooling
