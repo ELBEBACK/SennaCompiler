@@ -158,3 +158,5 @@ void SemanticAnalyzer::report_error(const std::string& message) {
     errors_list.push_back("Semantic Error: " + message);
     has_error = true;
 }
+
+void SemanticAnalyzer::visit(InputNode& node) {}

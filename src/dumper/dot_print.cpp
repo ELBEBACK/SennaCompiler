@@ -18,6 +18,11 @@ void GraphDump::visit(NumberNode& node) {
     os << "  node" << cur_node_id << " [label=\"Num: " << node.value << "\", fillcolor=lightblue];\n";
 }
 
+void GraphDump::visit(InputNode& node) {
+    cur_node_id = next_id();
+    os << "  node" << cur_node_id << " [label=\"Input: ?\", fillcolor=mediumorchid];\n";
+}
+
 void GraphDump::visit(VariableNode& node) {
     cur_node_id = next_id();
     os << "  node" << cur_node_id << " [label=\"Var: " << node.name << "\", fillcolor=lightgreen];\n";

@@ -9,7 +9,7 @@ enum class Opcode {
     ADD, SUB, MUL, DIV, MOD,
     CMP_EQ, CMP_NEQ, CMP_LT, CMP_GT, CMP_LEQ, CMP_GEQ,
     AND, OR, NOT,
-    CALL, PRINT,
+    CALL, PRINT, READ,
     JMP, BR, RET,
 };
 

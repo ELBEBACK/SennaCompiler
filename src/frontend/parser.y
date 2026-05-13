@@ -29,7 +29,7 @@ std::unique_ptr<BlockNode> rootBlock;
 
 %token <num> NUM
 %token <str> ID
-%token FN RETURN ARROW COMMA PRINT IF ELSE WHILE BREAK CONTINUE FOR
+%token FN RETURN ARROW COMMA PRINT IF ELSE WHILE BREAK CONTINUE FOR INPUT
 %token EQ_ASSIGN NEQ_ASSIGN LOW_EQ HIGH_EQ AND OR LOW HIGH ADD SUB MUL DIV MOD
 %token ASSIGN SEMICOLON LPAREN RPAREN LBRACE RBRACE
 %token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
@@ -118,6 +118,7 @@ arg_list:
 expr:
     NUM                     { $$ = new NumberNode($1); }
     | ID                    { $$ = new VariableNode($1); free($1); }
+    | INPUT                 { $$ = new InputNode(); }
     | expr ADD expr         { $$ = new BinaryOpNode(BinOp::ADD, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr SUB expr         { $$ = new BinaryOpNode(BinOp::SUB, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }
     | expr MUL expr         { $$ = new BinaryOpNode(BinOp::MUL, std::unique_ptr<ASTNode>($1), std::unique_ptr<ASTNode>($3)); }

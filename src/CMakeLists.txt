@@ -6,6 +6,7 @@ add_library(senna_compiler STATIC
     frontend/semantic.cpp
     midend/ir/ir.cpp
     midend/ir/ir_builder.cpp
+    midend/ir/ir_verify.cpp
     midend/cfg/cfg_builder.cpp
     dumper/ir_print.cpp
     dumper/dot_print.cpp

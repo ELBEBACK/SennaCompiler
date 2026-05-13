@@ -49,4 +49,5 @@ public:
     void visit(ContinueNode& node)          override;
     void visit(ForNode& node)               override;
     void visit(CompoundAssignNode& node)    override;
+    void visit(InputNode& node)             override;
 };

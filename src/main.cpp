@@ -13,6 +13,7 @@
 #include "ir_print.hpp"
 #include "cfg_builder.hpp"
 #include "cfg_print.hpp"
+#include "ir_verify.hpp"
 
 
 extern FILE* yyin;
@@ -98,6 +99,16 @@ int main(int argc, char** argv) {
 
     IRBuilder builder;
     Module    mod = builder.build(*rootBlock);
+
+    IRValidator validator;
+    if (!validator.validate(mod)) {
+        std::cerr << "[-] IR Verification failed!" << std::endl;
+        for (const auto& err : validator.get_errors()) {
+            std::cerr << "  - " << err.function_name << " [" << err.block_label << "]: " << err.message << std::endl;
+        }
+        return 1;
+    }
+    std::cout << "[+] IR Verification passed!" << std::endl;
 
     if (opts.has_emit(EmitTarget::IR)) {
 

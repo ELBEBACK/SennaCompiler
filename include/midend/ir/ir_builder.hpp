@@ -44,4 +44,5 @@ private:
     void visit(ContinueNode&)       override;
     void visit(ReturnStmtNode&)     override;
     void visit(FnDeclNode&)         override;
+    void visit(InputNode&)          override;
 };

@@ -17,6 +17,7 @@ public:
     void visit(PrintNode& n)          override { n.expr->accept(*this); }
     void visit(ReturnStmtNode& n)     override { if (n.expr) n.expr->accept(*this); }
     void visit(CallExprNode& n)       override { for (auto& a : n.arguments) a->accept(*this); }
+    void visit(InputNode&)          override {}
 
     void visit(BlockNode& n) override {
         for (auto& s : n.statements) s->accept(*this);
@@ -118,6 +119,10 @@ void IRBuilder::visit(NumberNode& node) {
 
 void IRBuilder::visit(VariableNode& node) {
     last_val_ = load_var(node.name);
+}
+
+void IRBuilder::visit(InputNode& node) {
+    last_val_ = cur_fn_->emit(cur_bb_, Opcode::READ, {});
 }
 
 void IRBuilder::visit(BinaryOpNode& node) {

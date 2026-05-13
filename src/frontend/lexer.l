@@ -46,6 +46,7 @@ int yycolumn = 1;
                             yylval.str = strdup(yytext);
                             return ID;
                         }
+"?"                     { return INPUT; }
 "++"                    { return INC; }
 "--"                    { return DEC; }
 "+="                    { return ADD_ASSIGN; }

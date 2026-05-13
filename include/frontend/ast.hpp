@@ -21,6 +21,7 @@ class BreakNode;
 class ContinueNode;
 class ForNode;
 class CompoundAssignNode;
+class InputNode;
 
 class IVisitor {
 public:
@@ -41,6 +42,7 @@ public:
     virtual void visit(ContinueNode& node) = 0;
     virtual void visit(ForNode& node) = 0;
     virtual void visit(CompoundAssignNode& node) = 0;
+    virtual void visit(InputNode& node) = 0;
 };
 
 class ASTNode {
@@ -206,5 +208,10 @@ public:
     CompoundAssignNode(const std::string& name, BinOp op, std::unique_ptr<ASTNode> e)
         : var_name(name), op(op), expr(std::move(e)) {}
 
+    void accept(IVisitor& visitor) override { visitor.visit(*this); }
+};
+
+class InputNode : public ASTNode {
+public:
     void accept(IVisitor& visitor) override { visitor.visit(*this); }
 };
