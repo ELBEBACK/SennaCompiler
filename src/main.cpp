@@ -17,7 +17,9 @@
 #include "dom_tree.hpp"
 #include "dom_front.hpp"
 #include "doms_print.hpp"
-#include "mem2reg.hpp"
+#include "ssa.hpp"
+#include "phi_node.hpp"
+#include "llvm_emit.hpp"
 
 extern FILE* yyin;
 extern int yyparse(std::vector<std::string>& syntax_errors);
@@ -276,7 +278,20 @@ int main(int argc, char** argv) {
     }
 
     if (opts.has_emit(EmitTarget::LLVM)) {
-        std::cout << "[+] .ll emit: not yet implemented, but optget seems to work for it\n";
+        const std::string path = "output/out.ll";
+        if (ensure_dir(path)) {
+            std::ofstream out(path);
+            if (!out.is_open()) {
+                std::cerr << "senna: cannot open " << path << " for writing\n";
+                fclose(file);
+                return 1;
+            }
+
+            LLVMEmitter llvm_emitter(out);
+            llvm_emitter.emit(mod);
+            std::cout << "[+] LLVM IR has been saved to " << path << "\n";
+            std::cout << "[*] To compile: clang -O0 " << path << " -o program\n";
+        }
     }
 
     fclose(file);

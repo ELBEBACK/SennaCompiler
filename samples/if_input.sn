@@ -1,0 +1,7 @@
+x = ?; // Ввод числа
+if (x > 10) {
+    res = 1;
+} else {
+    res = 0;
+}
+print res;

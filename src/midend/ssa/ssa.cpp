@@ -1,5 +1,5 @@
-#include "mem2reg.hpp"
-#include "phi_placement.hpp"
+#include "ssa.hpp"
+#include "phi_node.hpp"
 
 #include <algorithm>
 #include <stack>
