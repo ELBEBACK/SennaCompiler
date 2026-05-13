@@ -14,6 +14,10 @@
 #include "cfg_builder.hpp"
 #include "cfg_print.hpp"
 #include "ir_verify.hpp"
+#include "dom_tree.hpp"
+#include "dom_front.hpp"
+#include "doms_print.hpp"
+
 
 
 extern FILE* yyin;
@@ -122,6 +126,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    
     CFGBuilder cfg_builder;
     cfg_builder.build(mod);
 
@@ -143,13 +148,57 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (opts.has_emit(EmitTarget::DOM)) {
-        std::cout << "[+] domtree emit: not yet implemented, but optget seems to work for it\n";
+
+    DomTree   dom;
+    DomFronts fronts;
+    for (auto& fn : mod.functions) {
+        dom.build(*fn);
+        fronts.build(*fn, dom);
     }
 
-    if (opts.has_emit(EmitTarget::FDOM)) {
-        std::cout << "[+] dom frontiers emit: not yet implemented, but optget seems to work for it\n";
+
+    if (opts.has_emit(EmitTarget::DOM)) {
+        const std::string dot_dir = "output/dot";
+        if (!ensure_dir(dot_dir + "/dummy.dot")) { fclose(file); return 1; }
+ 
+        for (auto& fn : mod.functions) {
+            DomTree per_fn_dom;
+            per_fn_dom.build(*fn);
+ 
+            std::string path = dot_dir + "/dom_" + fn->name + ".dot";
+            std::ofstream out(path);
+            if (out.is_open()) {
+                DomTreePrinter printer(out);
+                printer.print(*fn, per_fn_dom);
+                std::cout << "[+] Dominator tree for @" << fn->name
+                          << " saved to " << path << "\n";
+            }
+        }
     }
+
+
+    if (opts.has_emit(EmitTarget::FDOM)) {
+        const std::string dot_dir = "output/dot";
+        if (!ensure_dir(dot_dir + "/dummy.dot")) { fclose(file); return 1; }
+ 
+        for (auto& fn : mod.functions) {
+            DomTree per_fn_dom;
+            per_fn_dom.build(*fn);
+ 
+            DomFronts per_fn_fronts;
+            per_fn_fronts.build(*fn, per_fn_dom);
+ 
+            std::string path = dot_dir + "/fdom_" + fn->name + ".dot";
+            std::ofstream out(path);
+            if (out.is_open()) {
+                DomFrontPrinter printer(out);
+                printer.print(*fn, per_fn_fronts);
+                std::cout << "[+] Dominance frontiers for @" << fn->name
+                          << " saved to " << path << "\n";
+            }
+        }
+    }
+
 
     if (opts.has_emit(EmitTarget::SSA)) {
         std::cout << "[+] SSA IR emit: not yet implemented, but optget seems to work for it\n";

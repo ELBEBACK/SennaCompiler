@@ -8,9 +8,12 @@ add_library(senna_compiler STATIC
     midend/ir/ir_builder.cpp
     midend/ir/ir_verify.cpp
     midend/cfg/cfg_builder.cpp
+    midend/dom/dom_tree.cpp
+    midend/fdom/dom_front.cpp
     dumper/ir_print.cpp
     dumper/dot_print.cpp
     dumper/cfg_print.cpp
+    dumper/doms_print.cpp
     ${FLEX_MyLexer_OUTPUTS}
     ${BISON_MyParser_OUTPUTS}
 )
@@ -21,6 +24,8 @@ target_include_directories(senna_compiler
     ${CMAKE_SOURCE_DIR}/include/frontend
     ${CMAKE_SOURCE_DIR}/include/midend/ir
     ${CMAKE_SOURCE_DIR}/include/midend/cfg
+    ${CMAKE_SOURCE_DIR}/include/midend/dom
+    ${CMAKE_SOURCE_DIR}/include/midend/fdom
     ${CMAKE_SOURCE_DIR}/include/dumper
     ${CMAKE_CURRENT_BINARY_DIR}
 )
