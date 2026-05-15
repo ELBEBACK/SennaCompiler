@@ -21,6 +21,7 @@
 #include "ssa.hpp"
 #include "phi_node.hpp"
 #include "dce.hpp"
+#include "const_fold_prop.hpp"
 #include "llvm_emit.hpp"
 
 extern FILE* yyin;
@@ -158,9 +159,15 @@ int main(int argc, char** argv) {
                 if (mem2reg.run(*fn, dom, fronts))
                     std::cout << "[+] Mem2Reg: promoted @" << fn->name << " to SSA\n";
 
-                DCE dce;
-                if (dce.run(*fn))
-                    std::cout << "[+] DCE: dead instructions were found and eliminated in @" << fn->name << "\n";
+                if (opts.opt_level >= OptLevel::O1) {
+                    ConstFold cf;
+                    if (cf.run(*fn))
+                        std::cout << "[+] ConstFold: folded constants in @" << fn->name << "\n";
+
+                    DCE dce;
+                    if (dce.run(*fn))
+                        std::cout << "[+] DCE: eliminated dead instructions in @" << fn->name << "\n";
+                }
             }
         }
     }

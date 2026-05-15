@@ -132,10 +132,8 @@ senna program.sn --emit=ssa
 - [ ] Loop canonicalization — single preheader, single latch, dedicated exits
 
 ### Middle-end — Scalar optimizations
-- [ ] Dead code elimination (DCE)
+- [x] Dead code elimination (DCE)
 - [ ] Constant folding and algebraic simplification
-- [ ] SCCP — sparse conditional constant propagation
-- [ ] GVN — global value numbering
 
 ### Middle-end — Loop optimizations
 - [ ] LICM — loop-invariant code motion

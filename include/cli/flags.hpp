@@ -68,7 +68,7 @@ static void print_usage(const char* name) {
     << "                        llvm   LLVM IR text, ready for clang\n"
     << "  " << bold << "-O<level>" << reset << "           Optimisation level (default: 1):\n"
     << "                        0      No optimisations\n"
-    << "                        1      Dead code elimination\n"
+    << "                        1      DCE; constant folding-propagation\n"
     << "  " << bold << "-h, --help" << reset << "          Print this message\n\n";
 }
 
