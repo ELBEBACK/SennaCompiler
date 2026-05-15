@@ -1,4 +1,4 @@
-.PHONY: all build install dot clean uninstall
+.PHONY: all build install dot clean uninstall test
 
 BUILD_DIR := build
 PREFIX    := $(HOME)/.local
@@ -20,3 +20,6 @@ clean:
 
 uninstall:
 	rm -rf $(PREFIX)/bin/senna
+
+test: build
+	cd $(BUILD_DIR) && ctest --output-on-failure

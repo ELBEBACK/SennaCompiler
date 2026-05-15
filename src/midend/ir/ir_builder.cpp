@@ -67,7 +67,13 @@ static Opcode compound_arith(BinOp op) {
     }
 }
 
-bool IRBuilder::terminated() const { return cur_bb_->is_terminated(); }
+bool IRBuilder::terminated() const {
+    if (cur_bb_ != cur_fn_->entry && cur_bb_->preds.empty()) {
+        return true;
+    }
+    return cur_bb_->is_terminated();
+}
+
 void IRBuilder::set_block(BasicBlock* bb) { cur_bb_ = bb; }
 
 Instruction* IRBuilder::alloca_of(const std::string& var) {
@@ -208,14 +214,14 @@ void IRBuilder::visit(IfStmtNode& node) {
 
     set_block(true_bb);
     node.true_block->accept(*this);
-    if (!true_bb->is_terminated()) {
+    if (!terminated()) {
         cur_fn_->emit(true_bb, Opcode::JMP, {})->bb1 = merge_bb;
         true_bb->add_edge(merge_bb);
     }
 
     set_block(false_bb);
     if (node.false_block) node.false_block->accept(*this);
-    if (!false_bb->is_terminated()) {
+    if (!terminated()) {
         cur_fn_->emit(false_bb, Opcode::JMP, {})->bb1 = merge_bb;
         false_bb->add_edge(merge_bb);
     }

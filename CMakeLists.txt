@@ -3,6 +3,8 @@ project(SennaC)
 
 set(CMAKE_CXX_STANDARD 17)
 
+enable_testing()
+
 include(FetchContent)
 
 find_package(FLEX QUIET)
@@ -33,3 +35,4 @@ if(NOT BISON_FOUND)
 endif()
 
 add_subdirectory(src)
+add_subdirectory(tests)
