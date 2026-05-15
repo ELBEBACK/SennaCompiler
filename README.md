@@ -142,8 +142,8 @@ senna program.sn --emit=ssa
 - [x] Type lowering (all values → `i64`; alloca slots → `i64*` in pre-SSA LLVM IR)
 - [x] Phi node lowering (operands emitted as `[ value, %label ]` pairs)
 - [x] LLVM IR text emitter (`--emit=llvm`)
-- [x] Invoke `clang -O0` on the emitted `.ll` to output binary 
+- [x] Invoke `clang -O0` on the emitted `.ll` to output binary
 
 ### Debug and tooling
-- [ ] `--explain` — trace pass decisions (phi placement sites, DCE removals)
+- [x] `--explain` — trace pass decisions (phi placement sites, DCE removals)
 - [x] `make dot` renders all DOT outputs to PNG

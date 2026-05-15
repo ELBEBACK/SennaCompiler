@@ -6,4 +6,6 @@
 
 std::unordered_set<BasicBlock*> compute_phi_blocks(
     const DomFronts&                       fronts,
-    const std::unordered_set<BasicBlock*>& def_sites);
+    const std::unordered_set<BasicBlock*>& def_sites,
+    std::string_view                       fn_name  = "",
+    std::string_view                       var_name = "");

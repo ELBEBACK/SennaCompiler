@@ -128,7 +128,8 @@ bool Mem2Reg::run(Function& fn, const DomTree& dom, const DomFronts& fronts) {
 
         if (def_sites.empty()) continue;
 
-        auto placement = compute_phi_blocks(fronts, def_sites);
+        auto placement = compute_phi_blocks(fronts, def_sites,
+                                            fn.name, alloca->name);
 
         for (auto* block : placement) {
             auto* phi = fn.make_inst(fn.new_temp(), Opcode::PHI, {});

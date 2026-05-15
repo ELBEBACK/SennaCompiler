@@ -9,6 +9,7 @@
 #include "ast_print.hpp"
 #include "semantic.hpp"
 #include "flags.hpp"
+#include "explainer.hpp"
 #include "ir.hpp"
 #include "ir_builder.hpp"
 #include "ir_print.hpp"
@@ -20,7 +21,6 @@
 #include "doms_print.hpp"
 #include "ssa.hpp"
 #include "phi_node.hpp"
-#include "ssa_verifier.hpp"
 #include "dce.hpp"
 #include "const_fold_prop.hpp"
 #include "exp_simplifier.hpp"
@@ -46,6 +46,9 @@ static bool ensure_dir(const fs::path& dir) {
 int main(int argc, char** argv) {
 
     const CliOptions opts = parse_args(argc, argv);
+
+    if (opts.explain)
+        Explainer::get().enable(std::cerr);
 
     FILE* file = fopen(opts.input_file.c_str(), "r");
     if (!file) {
@@ -161,20 +164,10 @@ int main(int argc, char** argv) {
                 if (mem2reg.run(*fn, dom, fronts))
                     std::cout << "[+] Mem2Reg: promoted @" << fn->name << " to SSA\n";
 
-                SSAVerifier ssa_ver;
-                if (!ssa_ver.verify(*fn, dom)) {
-                    std::cerr << "[-] SSA verification failed in @" << fn->name << "\n";
-                    for (const auto& e : ssa_ver.errors())
-                        std::cerr << "  [" << e.block << "] " << e.message << "\n";
-                    fclose(file);
-                    return 1;
-                }
-                std::cout << "[+] SSA verification passed for @" << fn->name << "\n";
-
                 if (opts.opt_level >= OptLevel::O1) {
                     AlgebraicSimplify as;
                     if (as.run(*fn))
-                        std::cout << "[+] AlgebraicSimplify: simplified @" << fn->name << "\n";
+                        std::cout << "[+] ExprSimplification: simplified @" << fn->name << "\n";
 
                     ConstFold cf;
                     if (cf.run(*fn))

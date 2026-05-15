@@ -20,14 +20,15 @@ enum class EmitTarget {
 };
 
 enum class OptLevel {
-    O0,   
-    O1,   
+    O0,
+    O1,
 };
 
 struct CliOptions {
     std::string             input_file;
     std::vector<EmitTarget> emit_targets;
-    OptLevel                opt_level = OptLevel::O1;   
+    OptLevel                opt_level = OptLevel::O1;
+    bool                    explain   = false;
 
     bool has_emit(EmitTarget t) const {
         for (const auto& e : emit_targets)
@@ -69,23 +70,28 @@ static void print_usage(const char* name) {
     << "  " << bold << "-O<level>" << reset << "           Optimisation level (default: 1):\n"
     << "                        0      No optimisations\n"
     << "                        1      DCE; constant folding-propagation\n"
+    << "  " << bold << "--explain" << reset << "           Trace pass decisions to stderr:\n"
+    << "                        domtree  — dom-set changes per iteration, idom selection\n"
+    << "                        fdom     — DF walk steps and stop conditions\n"
+    << "                        phi      — IDF worklist expansion per variable\n"
     << "  " << bold << "-h, --help" << reset << "          Print this message\n\n";
 }
 
-} // namespace clinterface
+}
 
 
 inline CliOptions parse_args(int argc, char** argv) {
     CliOptions opts;
 
     static const option long_opts[] = {
-        {"emit", required_argument, nullptr, 'e'},
-        {"help", no_argument,       nullptr, 'h'},
-        {nullptr, 0,                nullptr,  0 }
+        {"emit",    required_argument, nullptr, 'e'},
+        {"explain", no_argument,       nullptr, 'x'},
+        {"help",    no_argument,       nullptr, 'h'},
+        {nullptr,   0,                 nullptr,  0 }
     };
 
     int c, idx;
-    while ((c = getopt_long(argc, argv, "e:hO:", long_opts, &idx)) != -1) {
+    while ((c = getopt_long(argc, argv, "e:hO:x", long_opts, &idx)) != -1) {
         switch (c) {
             case 'e':
                 for (const auto& t : clinterface::split_csv(optarg)) {
@@ -115,6 +121,10 @@ inline CliOptions parse_args(int argc, char** argv) {
                     clinterface::print_usage(argv[0]);
                     exit(1);
                 }
+                break;
+
+            case 'x':
+                opts.explain = true;
                 break;
 
             case 'h':
