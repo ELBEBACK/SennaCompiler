@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <stdint.h>
 
 #include "ast.hpp"
 #include "op_types.hpp"
@@ -16,8 +17,8 @@ private:
     std::vector<std::string> errors_list;
     std::vector<std::unordered_map<std::string, SymbolInfo>> scopes;
     bool has_error  = false;
-    int loop_depth  = 0;
-    int fn_depth    = 0;
+    int32_t loop_depth  = 0;
+    int32_t fn_depth    = 0;
 
     void enter_scope();
     void exit_scope();

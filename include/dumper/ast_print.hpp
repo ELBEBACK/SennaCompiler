@@ -32,7 +32,7 @@ public:
     void footer_write() const;
 
 private:
-    int  next_id() {return ++node_cnt;}
+    int32_t  next_id() {return ++node_cnt;}
     void edge_write(int from, int to) const;
     std::string get_op(const BinOp& op) const;
 };

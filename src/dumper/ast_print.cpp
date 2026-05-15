@@ -9,7 +9,7 @@ void ASTPrint::footer_write() const {
     os << "}\n";
 }
 
-void ASTPrint::edge_write(int from, int to) const {
+void ASTPrint::edge_write(int32_t from, int32_t to) const {
     os << "  node" << from << " -> node" << to << ";\n";
 }
 
@@ -29,7 +29,7 @@ void ASTPrint::visit(VariableNode& node) {
 }
 
 void ASTPrint::visit(BinaryOpNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << " [label=\"Op: " << get_op(node.op) << "\", fillcolor=gold];\n";
 
     node.left->accept(*this);
@@ -42,7 +42,7 @@ void ASTPrint::visit(BinaryOpNode& node) {
 }
 
 void ASTPrint::visit(AssignmentNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << " [label=\"Assign: " << node.var_name << "\", fillcolor=salmon];\n";
 
     node.expr->accept(*this);
@@ -52,7 +52,7 @@ void ASTPrint::visit(AssignmentNode& node) {
 }
 
 void ASTPrint::visit(PrintNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << " [label=\"Print\", fillcolor=plum];\n";
 
     node.expr->accept(*this);
@@ -62,7 +62,7 @@ void ASTPrint::visit(PrintNode& node) {
 }
 
 void ASTPrint::visit(BlockNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << " [label=\"Block\", fillcolor=gray];\n";
 
     for (auto& stmt : node.statements) {
@@ -74,7 +74,7 @@ void ASTPrint::visit(BlockNode& node) {
 }
 
 void ASTPrint::visit(IfStmtNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << " [label=\"If\", fillcolor=orange];\n";
 
     node.condition->accept(*this);
@@ -117,7 +117,7 @@ std::string ASTPrint::get_op(const BinOp& op) const {
 }
 
 void ASTPrint::visit(UnaryOpNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
 
     std::string label = {};
     switch(node.op) {
@@ -133,7 +133,7 @@ void ASTPrint::visit(UnaryOpNode& node) {
 }
 
 void ASTPrint::visit(CallExprNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << " [label=\"Call: " << node.function_name << "\", fillcolor=lightskyblue];\n";
     for (auto& arg : node.arguments) {
         arg->accept(*this);
@@ -143,7 +143,7 @@ void ASTPrint::visit(CallExprNode& node) {
 }
 
 void ASTPrint::visit(ReturnStmtNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << " [label=\"Return\", fillcolor=tomato];\n";
     if (node.expr) {
         node.expr->accept(*this);
@@ -153,11 +153,11 @@ void ASTPrint::visit(ReturnStmtNode& node) {
 }
 
 void ASTPrint::visit(FnDeclNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << " [label=\"Function: " << node.name << "\", fillcolor=mediumaquamarine];\n";
 
     for (auto& p : node.params) {
-        int pid = next_id();
+        int32_t pid = next_id();
         os << "  node" << pid << " [label=\"Param: " << p.name << "\", shape=ellipse];\n";
         edge_write(id, pid);
     }
@@ -178,7 +178,7 @@ void ASTPrint::visit(ContinueNode& node) {
 }
 
 void ASTPrint::visit(ForNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << "  [label=\"For\", fillcolor=cornflowerblue];\n";
 
     node.init->accept(*this);
@@ -197,7 +197,7 @@ void ASTPrint::visit(ForNode& node) {
 }
 
 void ASTPrint::visit(WhileStmtNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
     os << "  node" << id << " [label=\"While\", fillcolor=lightcoral];\n";
 
     node.condition->accept(*this);
@@ -210,7 +210,7 @@ void ASTPrint::visit(WhileStmtNode& node) {
 }
 
 void ASTPrint::visit(CompoundAssignNode& node) {
-    int id = next_id();
+    int32_t id = next_id();
 
     os << "  node" << id << " [label=\"CompAssign: " << node.var_name << " " << get_op(node.op) << "\", fillcolor=lightcoral];\n";
 

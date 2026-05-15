@@ -80,7 +80,7 @@ static void print_usage(const char* name) {
 }
 
 
-inline CliOptions parse_args(int argc, char** argv) {
+inline CliOptions parse_args(int32_t argc, char** argv) {
     CliOptions opts;
 
     static const option long_opts[] = {
@@ -90,7 +90,7 @@ inline CliOptions parse_args(int argc, char** argv) {
         {nullptr,   0,                 nullptr,  0 }
     };
 
-    int c, idx;
+    int32_t c, idx;
     while ((c = getopt_long(argc, argv, "e:hO:x", long_opts, &idx)) != -1) {
         switch (c) {
             case 'e':
