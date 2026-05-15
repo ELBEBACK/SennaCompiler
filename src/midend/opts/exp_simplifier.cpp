@@ -36,6 +36,8 @@ static Value* try_simplify(Function& fn, Instruction* inst) {
                 break;
             case Opcode::DIV: if (cr->val == 1) return lhs;             break;
             case Opcode::MOD: if (cr->val == 1) return fn.get_const(0); break;
+            case Opcode::OR:  if (cr->val == 0) return lhs;             break;  
+            case Opcode::AND: if (cr->val == 0) return fn.get_const(0); break;
             default: break;
         }
     }
@@ -47,6 +49,8 @@ static Value* try_simplify(Function& fn, Instruction* inst) {
                 if (cl->val == 1) return rhs;
                 if (cl->val == 0) return fn.get_const(0);
                 break;
+            case Opcode::OR:  if (cl->val == 0) return rhs;             break;
+            case Opcode::AND: if (cl->val == 0) return fn.get_const(0); break;
             default: break;
         }
     }

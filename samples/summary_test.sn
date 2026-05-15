@@ -8,7 +8,7 @@ func add(a, b) {
         }
     }
 }
-r = ?;
+
 for(e = 0; e < 1; e++) {
     c = add(1, 2);
 }
