@@ -19,9 +19,15 @@ enum class EmitTarget {
     LLVM,
 };
 
+enum class OptLevel {
+    O0,   
+    O1,   
+};
+
 struct CliOptions {
-    std::string              input_file;
-    std::vector<EmitTarget>  emit_targets;
+    std::string             input_file;
+    std::vector<EmitTarget> emit_targets;
+    OptLevel                opt_level = OptLevel::O1;   
 
     bool has_emit(EmitTarget t) const {
         for (const auto& e : emit_targets)
@@ -34,28 +40,20 @@ namespace clinterface {
 
 inline std::vector<std::string> split_csv(const std::string& s) {
     std::vector<std::string> ret;
-    
-    {
-        std::stringstream ss(s);
-        std::string token;
-
-        while (std::getline(ss, token, ','))
-            if (!token.empty()) ret.push_back(token);
-
-    }
-
+    std::stringstream ss(s);
+    std::string token;
+    while (std::getline(ss, token, ','))
+        if (!token.empty()) ret.push_back(token);
     return ret;
 }
-    
 
 inline const bool use_color = isatty(STDERR_FILENO);
-
 inline const char* bold  = use_color ? "\033[1m" : "";
 inline const char* reset = use_color ? "\033[0m" : "";
 
 static void print_usage(const char* name) {
-    std::cerr 
-    << bold << "Usage:" << reset << "\n"
+    std::cerr
+    << bold << "\nUsage:" << reset << "\n"
     << "  " << name << " <input_file.sn> [options]\n"
     << "\n"
     << bold << "Options:" << reset << "\n"
@@ -67,8 +65,11 @@ static void print_usage(const char* name) {
     << "                        fdom   Dominance frontiers as Graphviz DOT\n"
     << "                        ssa    IR after mem2reg, in SSA form\n"
     << "                        loops  Loop nesting tree as Graphviz DOT\n"
-    << "                        llvm   LLVM IR text, ready for llc\n"
-    << "  " << bold << "-h, --help" << reset << "          Manual message\n\n";
+    << "                        llvm   LLVM IR text, ready for clang\n"
+    << "  " << bold << "-O<level>" << reset << "           Optimisation level (default: 1):\n"
+    << "                        0      No optimisations\n"
+    << "                        1      Dead code elimination\n"
+    << "  " << bold << "-h, --help" << reset << "          Print this message\n\n";
 }
 
 } // namespace clinterface
@@ -84,19 +85,18 @@ inline CliOptions parse_args(int argc, char** argv) {
     };
 
     int c, idx;
-    while ((c = getopt_long(argc, argv, "e:h", long_opts, &idx)) != -1) {
+    while ((c = getopt_long(argc, argv, "e:hO:", long_opts, &idx)) != -1) {
         switch (c) {
             case 'e':
                 for (const auto& t : clinterface::split_csv(optarg)) {
-                    if      (t == "ast")    opts.emit_targets.push_back(EmitTarget::AST);
-                    else if (t == "ir")     opts.emit_targets.push_back(EmitTarget::IR);
-                    else if (t == "cfg")    opts.emit_targets.push_back(EmitTarget::CFG);
-                    else if (t == "dom")    opts.emit_targets.push_back(EmitTarget::DOM);
-                    else if (t == "fdom")   opts.emit_targets.push_back(EmitTarget::FDOM);
-                    else if (t == "ssa")    opts.emit_targets.push_back(EmitTarget::SSA);
-                    else if (t == "loops")  opts.emit_targets.push_back(EmitTarget::LOOPS);
-                    else if (t == "llvm")   opts.emit_targets.push_back(EmitTarget::LLVM);
-
+                    if      (t == "ast")   opts.emit_targets.push_back(EmitTarget::AST);
+                    else if (t == "ir")    opts.emit_targets.push_back(EmitTarget::IR);
+                    else if (t == "cfg")   opts.emit_targets.push_back(EmitTarget::CFG);
+                    else if (t == "dom")   opts.emit_targets.push_back(EmitTarget::DOM);
+                    else if (t == "fdom")  opts.emit_targets.push_back(EmitTarget::FDOM);
+                    else if (t == "ssa")   opts.emit_targets.push_back(EmitTarget::SSA);
+                    else if (t == "loops") opts.emit_targets.push_back(EmitTarget::LOOPS);
+                    else if (t == "llvm")  opts.emit_targets.push_back(EmitTarget::LLVM);
                     else {
                         std::cerr << "senna: unknown emit target '" << t << "'\n";
                         clinterface::print_usage(argv[0]);
@@ -104,9 +104,23 @@ inline CliOptions parse_args(int argc, char** argv) {
                     }
                 }
                 break;
+
+            case 'O':
+                if (std::string(optarg) == "0")
+                    opts.opt_level = OptLevel::O0;
+                else if (std::string(optarg) == "1")
+                    opts.opt_level = OptLevel::O1;
+                else {
+                    std::cerr << "senna: unknown optimisation level '-O" << optarg << "'\n";
+                    clinterface::print_usage(argv[0]);
+                    exit(1);
+                }
+                break;
+
             case 'h':
                 clinterface::print_usage(argv[0]);
                 exit(0);
+
             case '?':
                 clinterface::print_usage(argv[0]);
                 exit(1);
