@@ -12,6 +12,7 @@ add_library(senna_compiler STATIC
     midend/fdom/dom_front.cpp
     midend/ssa/phi_node.cpp
     midend/ssa/ssa.cpp
+    midend/opts/dce.cpp
     backend/llvm_emit.cpp
     dumper/ir_print.cpp
     dumper/ast_print.cpp
@@ -30,6 +31,7 @@ target_include_directories(senna_compiler
     ${CMAKE_SOURCE_DIR}/include/midend/ssa
     ${CMAKE_SOURCE_DIR}/include/midend/dom
     ${CMAKE_SOURCE_DIR}/include/midend/fdom
+    ${CMAKE_SOURCE_DIR}/include/midend/opts
     ${CMAKE_SOURCE_DIR}/include/backend
     ${CMAKE_SOURCE_DIR}/include/dumper
     ${CMAKE_CURRENT_BINARY_DIR}

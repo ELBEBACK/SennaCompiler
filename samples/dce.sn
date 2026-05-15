@@ -1,0 +1,7 @@
+
+x = 2 + 3;          
+
+dead1 = 10 * 20;    
+dead2 = dead1 + 1;  
+
+print x;

@@ -20,6 +20,7 @@
 #include "doms_print.hpp"
 #include "ssa.hpp"
 #include "phi_node.hpp"
+#include "dce.hpp"
 #include "llvm_emit.hpp"
 
 extern FILE* yyin;
@@ -156,6 +157,10 @@ int main(int argc, char** argv) {
                 Mem2Reg mem2reg;
                 if (mem2reg.run(*fn, dom, fronts))
                     std::cout << "[+] Mem2Reg: promoted @" << fn->name << " to SSA\n";
+
+                DCE dce;
+                if (dce.run(*fn))
+                    std::cout << "[+] DCE: dead instructions were found and eliminated in @" << fn->name << "\n";
             }
         }
     }
