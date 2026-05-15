@@ -124,7 +124,7 @@ senna program.sn --emit=ssa
 - [x] Dominator tree (`--emit=dom`)
 - [x] Dominance frontiers (`--emit=fdom`)
 - [x] `mem2reg` — phi placement + renaming via domtree walk (`--emit=ssa`)
-- [ ] SSA verifier — every use dominated by its def, phi operand count matches predecessor count
+- [x] SSA verifier — every use dominated by its def, phi operand count matches predecessor count
 
 ### Middle-end — Loop analysis
 - [ ] Natural loop detection (back-edges + dominator tree)
@@ -143,6 +143,7 @@ senna program.sn --emit=ssa
 - [x] Phi node lowering (operands emitted as `[ value, %label ]` pairs)
 - [x] LLVM IR text emitter (`--emit=llvm`)
 - [x] Invoke `clang -O0` on the emitted `.ll` to output binary 
+
 ### Debug and tooling
-- [ ] `--explain` — trace pass decisions (phi placement sites, DCE removals, SCCP lattice states)
+- [ ] `--explain` — trace pass decisions (phi placement sites, DCE removals)
 - [x] `make dot` renders all DOT outputs to PNG

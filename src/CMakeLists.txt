@@ -12,6 +12,7 @@ add_library(senna_compiler STATIC
     midend/fdom/dom_front.cpp
     midend/ssa/phi_node.cpp
     midend/ssa/ssa.cpp
+    midend/ssa/ssa_verifier.cpp
     midend/opts/dce.cpp
     midend/opts/const_fold_prop.cpp
     midend/opts/exp_simplifier.cpp
