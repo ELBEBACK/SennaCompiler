@@ -14,6 +14,7 @@ add_library(senna_compiler STATIC
     midend/ssa/ssa.cpp
     midend/opts/dce.cpp
     midend/opts/const_fold_prop.cpp
+    midend/opts/exp_simplifier.cpp
     backend/llvm_emit.cpp
     dumper/ir_print.cpp
     dumper/ast_print.cpp

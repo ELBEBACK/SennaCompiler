@@ -1,0 +1,49 @@
+x = 5;
+
+a = x + 0;
+print a;
+
+b = 0 + x;
+print b;
+
+c = x - 0;
+print c;
+
+d = x * 1;
+print d;
+
+e = 1 * x;
+print e;
+
+f = x * 0;
+print f;
+
+g = 0 * x;
+print g;
+
+h = x / 1;
+print h;
+
+i = x % 1;
+print i;
+
+j = x - x;
+print j;
+
+k = x == x;
+print k;
+
+l = x != x;
+print l;
+
+m = x < x;
+print m;
+
+n = x > x;
+print n;
+
+o = x <= x;
+print o;
+
+p = x >= x;
+print p;

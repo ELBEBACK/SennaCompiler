@@ -22,6 +22,7 @@
 #include "phi_node.hpp"
 #include "dce.hpp"
 #include "const_fold_prop.hpp"
+#include "exp_simplifier.hpp"
 #include "llvm_emit.hpp"
 
 extern FILE* yyin;
@@ -160,6 +161,10 @@ int main(int argc, char** argv) {
                     std::cout << "[+] Mem2Reg: promoted @" << fn->name << " to SSA\n";
 
                 if (opts.opt_level >= OptLevel::O1) {
+                    AlgebraicSimplify as;
+                    if (as.run(*fn))
+                        std::cout << "[+] ExprSimplification: simplified @" << fn->name << "\n";
+
                     ConstFold cf;
                     if (cf.run(*fn))
                         std::cout << "[+] ConstFold: folded constants in @" << fn->name << "\n";

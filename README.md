@@ -133,7 +133,7 @@ senna program.sn --emit=ssa
 
 ### Middle-end — Scalar optimizations
 - [x] Dead code elimination (DCE)
-- [ ] Constant folding and algebraic simplification
+- [x] Constant folding and algebraic simplification
 
 ### Middle-end — Loop optimizations
 - [ ] LICM — loop-invariant code motion
